@@ -35,7 +35,7 @@ export default function Dashboard() {
         
         <main className="px-4 space-y-6 pb-6">
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-3xl font-bold uppercase tracking-[0.2em] text-foreground/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
               Operations Hub
             </h1>
             <TimePeriodSelector value={period} onChange={setPeriod} />
