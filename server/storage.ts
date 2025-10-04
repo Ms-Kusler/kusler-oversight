@@ -150,8 +150,9 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const integration: Integration = {
       ...insertIntegration,
+      isConnected: insertIntegration.isConnected ?? false,
       credentials: insertIntegration.credentials ?? null,
-      lastSynced: insertIntegration.lastSynced ?? null,
+      lastSynced: null,
       id,
       createdAt: new Date()
     };
@@ -187,8 +188,9 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const automation: Automation = {
       ...insertAutomation,
+      isActive: insertAutomation.isActive ?? true,
       config: insertAutomation.config ?? null,
-      lastRun: insertAutomation.lastRun ?? null,
+      lastRun: null,
       id,
       createdAt: new Date()
     };
