@@ -1,0 +1,40 @@
+18:35:40.914 Running build in Washington, D.C., USA (East) – iad1
+18:35:40.915 Build machine configuration: 2 cores, 8 GB
+18:35:40.929 Cloning github.com/Ms-Kusler/kusler-oversight (Branch: main, Commit: 30f17c3)
+18:35:50.328 Cloning completed: 9.399s
+18:35:50.465 Restored build cache from previous deployment (Fj1NHfcnMDabWVar2zH46E8E4RCY)
+18:35:51.024 Running "vercel build"
+18:35:51.442 Vercel CLI 48.2.0
+18:35:52.237 Installing dependencies...
+18:35:53.732 
+18:35:53.733 up to date in 1s
+18:35:53.734 
+18:35:53.734 65 packages are looking for funding
+18:35:53.734   run `npm fund` for details
+18:35:54.689 [36mvite v5.4.20 [32mbuilding for production...[36m[39m
+18:35:54.742 transforming...
+18:35:55.071 Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+18:35:55.072   npx update-browserslist-db@latest
+18:35:55.072   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+18:35:56.136 
+18:35:56.137 A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+18:36:02.163 [32m✓[39m 2543 modules transformed.
+18:36:03.068 rendering chunks...
+18:36:03.083 computing gzip size...
+18:36:03.266 [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  0.89 kB[22m[1m[22m[2m │ gzip:   0.48 kB[22m
+18:36:03.267 [2m../dist/public/[22m[2massets/[22m[35mindex-yV5_YQQj.css  [39m[1m[2m 80.45 kB[22m[1m[22m[2m │ gzip:  12.94 kB[22m
+18:36:03.268 [2m../dist/public/[22m[2massets/[22m[36mindex-qktOAvjM.js   [39m[1m[33m843.62 kB[39m[22m[2m │ gzip: 239.02 kB[22m
+18:36:03.268 [32m✓ built in 8.55s[39m
+18:36:03.268 [33m
+18:36:03.269 (!) Some chunks are larger than 500 kB after minification. Consider:
+18:36:03.269 - Using dynamic import() to code-split the application
+18:36:03.269 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+18:36:03.270 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+18:36:03.342 
+18:36:03.342   dist/serverless.js  39.6kb
+18:36:03.343 
+18:36:03.343 ⚡ Done in 10ms
+18:36:12.602 Build Completed in /vercel/output [20s]
+18:36:12.837 Deploying outputs...
+18:36:20.274 Deployment completed
+18:36:21.137 Creating build cache...
