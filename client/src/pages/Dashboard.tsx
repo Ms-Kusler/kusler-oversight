@@ -7,6 +7,7 @@ import ProfitChart from "@/components/ProfitChart";
 import SystemStatus from "@/components/SystemStatus";
 import ActionButtons from "@/components/ActionButtons";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("home");
@@ -65,6 +66,8 @@ export default function Dashboard() {
           <SystemStatus />
 
           <ActionButtons />
+          
+          <Footer />
         </main>
 
         <BottomNav active={activePage} onNavigate={setActivePage} />
