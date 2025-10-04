@@ -101,11 +101,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { weeklyReports, lowCashAlerts, overdueInvoices, integrationFailures } = req.body;
       
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const currentPrefs = (user.emailPreferences as any) || {
+        weeklyReports: true,
+        lowCashAlerts: true,
+        overdueInvoices: true,
+        integrationFailures: true,
+      };
+      
       const emailPreferences = {
-        weeklyReports: weeklyReports !== undefined ? weeklyReports : true,
-        lowCashAlerts: lowCashAlerts !== undefined ? lowCashAlerts : true,
-        overdueInvoices: overdueInvoices !== undefined ? overdueInvoices : true,
-        integrationFailures: integrationFailures !== undefined ? integrationFailures : true,
+        weeklyReports: weeklyReports !== undefined ? weeklyReports : currentPrefs.weeklyReports,
+        lowCashAlerts: lowCashAlerts !== undefined ? lowCashAlerts : currentPrefs.lowCashAlerts,
+        overdueInvoices: overdueInvoices !== undefined ? overdueInvoices : currentPrefs.overdueInvoices,
+        integrationFailures: integrationFailures !== undefined ? integrationFailures : currentPrefs.integrationFailures,
       };
       
       await storage.updateUser(req.userId!, { emailPreferences });

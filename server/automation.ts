@@ -36,7 +36,6 @@ class AutomationSystem {
     name: string,
     targetHour: number,
     targetDay: number | null,
-    intervalMs: number,
     handler: () => Promise<void>
   ) {
     const getNextRunTime = () => {
@@ -67,24 +66,15 @@ class AutomationSystem {
       const timeout = setTimeout(async () => {
         try {
           await handler();
-          console.log(`✓ Completed scheduled task: ${name}`);
+          console.log(`✓ Completed scheduled task: ${name} at ${new Date().toLocaleString()}`);
         } catch (error) {
           console.error(`✗ Error in scheduled task ${name}:`, error);
         }
 
-        const interval = setInterval(async () => {
-          try {
-            await handler();
-            console.log(`✓ Completed scheduled task: ${name}`);
-          } catch (error) {
-            console.error(`✗ Error in scheduled task ${name}:`, error);
-          }
-        }, intervalMs);
-
-        this.timers.set(id, interval);
+        scheduleNext();
       }, delay);
 
-      this.timers.set(`${id}-initial`, timeout);
+      this.timers.set(id, timeout);
       console.log(`⏰ Scheduled ${name} to run at ${nextRun.toLocaleString()}`);
     };
 
@@ -131,7 +121,6 @@ export async function startAutomations() {
     'Generate and send weekly reports',
     8,
     1,
-    7 * 24 * 60 * 60 * 1000,
     async () => {
       const users = await storage.getAllUsers();
       const activeClients = users.filter(u => u.role === 'client' && u.isActive);
@@ -200,7 +189,6 @@ export async function startAutomations() {
     'Check for overdue invoices',
     9,
     null,
-    24 * 60 * 60 * 1000,
     async () => {
       const users = await storage.getAllUsers();
       const activeClients = users.filter(u => u.role === 'client' && u.isActive);
