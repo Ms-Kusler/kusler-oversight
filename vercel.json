@@ -1,16 +1,19 @@
 {
-  "version": 2,
-  "buildCommand": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && esbuild server/serverless.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-  "builds": [
-    {
-      "src": "dist/serverless.js",
-      "use": "@vercel/node"
+  "buildCommand": "vite build && esbuild server/serverless.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+  "outputDirectory": "dist/public",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/dist/serverless.js"
+      "source": "/api/:path*",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
     }
   ]
 }
