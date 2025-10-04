@@ -77,7 +77,7 @@ export default function AddClientDialog() {
         <DialogHeader>
           <DialogTitle>Create New Client Account</DialogTitle>
           <DialogDescription>
-            Add a new client to Operations Hub. They'll use these credentials to log in.
+            Add a new client to Kusler Oversight. They'll use these credentials to log in.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -22,30 +22,30 @@ export default function FAQ() {
       category: "Getting Started",
       questions: [
         { q: "How do I connect my accounting software?", a: "Navigate to Workflows > Connected Integrations, then click 'Connect' next to your preferred accounting software (QuickBooks, Xero, etc.). Follow the OAuth flow to authorize access." },
-        { q: "What data does Operations Hub track?", a: "Operations Hub tracks your cash flow, invoices, expenses, payment statuses, and generates automated reports. All data is synced in real-time from your connected apps." },
+        { q: "What data does Kusler Oversight track?", a: "Kusler Oversight tracks your cash flow, invoices, expenses, payment statuses, and generates automated reports. All data is synced in real-time from your connected apps." },
         { q: "How often is my data updated?", a: "Data syncs automatically every 15 minutes, or you can trigger a manual sync from any page. Real-time updates are pushed for critical events like payments received." },
       ]
     },
     {
       category: "Automation & Workflows",
       questions: [
-        { q: "How do weekly email briefs work?", a: "Every Monday at 8 AM, Operations Hub compiles your financial data and sends a summary email including cash flow, upcoming bills, and action items. You can customize the schedule in Workflows settings." },
+        { q: "How do weekly email briefs work?", a: "Every Monday at 8 AM, Kusler Oversight compiles your financial data and sends a summary email including cash flow, upcoming bills, and action items. You can customize the schedule in Workflows settings." },
         { q: "Can I create custom workflows?", a: "Yes! Go to Workflows > New Workflow to create custom automation rules. You can set triggers (like low cash alerts) and actions (send email, create task, etc.)." },
-        { q: "What happens if an integration fails?", a: "You'll receive an immediate notification. Operations Hub will attempt to reconnect automatically. If the issue persists, check Workflows > Connected Integrations for troubleshooting steps." },
+        { q: "What happens if an integration fails?", a: "You'll receive an immediate notification. Kusler Oversight will attempt to reconnect automatically. If the issue persists, check Workflows > Connected Integrations for troubleshooting steps." },
       ]
     },
     {
       category: "Security & Data",
       questions: [
         { q: "Is my financial data secure?", a: "Yes. All data is encrypted in transit (TLS 1.3) and at rest (AES-256). We run automated security scans every hour and never store your banking credentials - we use OAuth for all integrations." },
-        { q: "Who can access my data?", a: "Only users you explicitly invite to your Operations Hub account. You can set role-based permissions (Owner, Manager, Viewer) to control access levels." },
+        { q: "Who can access my data?", a: "Only users you explicitly invite to your Kusler Oversight account. You can set role-based permissions (Owner, Manager, Viewer) to control access levels." },
         { q: "How long is data retained?", a: "Financial data is retained indefinitely while your account is active. You can export or delete your data at any time from Settings." },
       ]
     },
     {
       category: "Billing & Support",
       questions: [
-        { q: "How does billing work?", a: "Operations Hub is billed monthly per business. Your subscription includes unlimited users, workflows, and data storage. See Settings > Billing for details." },
+        { q: "How does billing work?", a: "Kusler Oversight is billed monthly per business. Your subscription includes unlimited users, workflows, and data storage. See Settings > Billing for details." },
         { q: "Can I get help setting up?", a: "Absolutely! Click 'Request Developer Assistance' in the menu for priority support from Kusler Consulting. We offer onboarding calls and custom setup assistance." },
         { q: "What if I need a custom feature?", a: "Contact us via 'Request Developer Assistance' to discuss custom integrations or features. We work with clients to build tailored solutions." },
       ]

@@ -3,6 +3,7 @@ import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { startAutomations } from "./automation";
+import { seedAdminUser, seedDemoClient } from "./seed";
 
 const app = express();
 app.use(express.json());
@@ -78,8 +79,10 @@ app.use((req, res, next) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    await seedAdminUser();
+    await seedDemoClient();
     startAutomations();
   });
 })();

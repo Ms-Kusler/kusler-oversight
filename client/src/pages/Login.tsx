@@ -43,7 +43,7 @@ export default function Login() {
               <Building2 className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Operations Hub</CardTitle>
+          <CardTitle className="text-2xl">Kusler Oversight</CardTitle>
           <CardDescription>
             Sign in to your account to access your dashboard
           </CardDescription>

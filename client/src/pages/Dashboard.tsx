@@ -58,7 +58,7 @@ export default function Dashboard() {
         <main className="px-4 space-y-5 pb-6 pt-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h1 className="text-3xl sm:text-4xl font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-foreground/90 text-center sm:text-left flex-1" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
-              Operations Hub
+              Kusler Oversight
             </h1>
             <TimePeriodSelector value={period} onChange={setPeriod} />
           </div>
