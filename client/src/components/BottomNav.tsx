@@ -1,17 +1,20 @@
 import { Home, DollarSign, Workflow, FileBarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 interface BottomNavProps {
   active?: string;
   onNavigate?: (tab: string) => void;
 }
 
-export default function BottomNav({ active = "home", onNavigate }: BottomNavProps) {
+export default function BottomNav({ active, onNavigate }: BottomNavProps) {
+  const [location, setLocation] = useLocation();
+  
   const items = [
-    { id: "home", label: "Home", icon: Home },
-    { id: "finances", label: "Finances", icon: DollarSign },
-    { id: "workflows", label: "Workflows", icon: Workflow },
-    { id: "reports", label: "Reports", icon: FileBarChart },
+    { id: "home", label: "Home", icon: Home, path: "/" },
+    { id: "finances", label: "Finances", icon: DollarSign, path: "/finances" },
+    { id: "workflows", label: "Workflows", icon: Workflow, path: "/workflows" },
+    { id: "reports", label: "Reports", icon: FileBarChart, path: "/reports" },
   ];
 
   return (
@@ -19,12 +22,13 @@ export default function BottomNav({ active = "home", onNavigate }: BottomNavProp
       <div className="flex items-center justify-around h-16 max-w-7xl mx-auto relative">
         {items.map((item) => {
           const Icon = item.icon;
-          const isActive = active === item.id;
+          const isActive = active === item.id || location === item.path;
           return (
             <button
               key={item.id}
               onClick={() => {
                 console.log(`Navigating to ${item.id}`);
+                setLocation(item.path);
                 onNavigate?.(item.id);
               }}
               className={cn(
