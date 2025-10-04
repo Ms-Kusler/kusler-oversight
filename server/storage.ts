@@ -255,32 +255,39 @@ export class MemStorage implements IStorage {
   }
 }
 
-import { db } from './db';
 import { eq, desc, and } from 'drizzle-orm';
 import * as schema from '@shared/schema';
+import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 
 export class PostgresStorage implements IStorage {
+  private db: NeonHttpDatabase<typeof schema>;
+
+  constructor() {
+    // Lazy-load db connection only when PostgresStorage is instantiated
+    const { db } = require('./db');
+    this.db = db;
+  }
   async getUser(id: string): Promise<User | undefined> {
-    const result = await db.select().from(schema.users).where(eq(schema.users.id, id));
+    const result = await this.db.select().from(schema.users).where(eq(schema.users.id, id));
     return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(schema.users).where(eq(schema.users.username, username));
+    const result = await this.db.select().from(schema.users).where(eq(schema.users.username, username));
     return result[0];
   }
 
   async getAllUsers(): Promise<User[]> {
-    return await db.select().from(schema.users);
+    return await this.db.select().from(schema.users);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await db.insert(schema.users).values(insertUser).returning();
+    const result = await this.db.insert(schema.users).values(insertUser).returning();
     return result[0];
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
-    const result = await db.update(schema.users)
+    const result = await this.db.update(schema.users)
       .set(updates)
       .where(eq(schema.users.id, id))
       .returning();
@@ -288,36 +295,36 @@ export class PostgresStorage implements IStorage {
   }
 
   async getTransactions(userId: string): Promise<Transaction[]> {
-    return await db.select()
+    return await this.db.select()
       .from(schema.transactions)
       .where(eq(schema.transactions.userId, userId))
       .orderBy(desc(schema.transactions.date));
   }
 
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const result = await db.insert(schema.transactions).values(insertTransaction).returning();
+    const result = await this.db.insert(schema.transactions).values(insertTransaction).returning();
     return result[0];
   }
 
   async getInvoices(userId: string): Promise<Invoice[]> {
-    return await db.select()
+    return await this.db.select()
       .from(schema.invoices)
       .where(eq(schema.invoices.userId, userId))
       .orderBy(schema.invoices.dueDate);
   }
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
-    const result = await db.select().from(schema.invoices).where(eq(schema.invoices.id, id));
+    const result = await this.db.select().from(schema.invoices).where(eq(schema.invoices.id, id));
     return result[0];
   }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
-    const result = await db.insert(schema.invoices).values(insertInvoice).returning();
+    const result = await this.db.insert(schema.invoices).values(insertInvoice).returning();
     return result[0];
   }
 
   async updateInvoice(id: string, updates: Partial<Invoice>): Promise<Invoice | undefined> {
-    const result = await db.update(schema.invoices)
+    const result = await this.db.update(schema.invoices)
       .set(updates)
       .where(eq(schema.invoices.id, id))
       .returning();
@@ -325,24 +332,24 @@ export class PostgresStorage implements IStorage {
   }
 
   async getIntegrations(userId: string): Promise<Integration[]> {
-    return await db.select()
+    return await this.db.select()
       .from(schema.integrations)
       .where(eq(schema.integrations.userId, userId))
       .orderBy(desc(schema.integrations.createdAt));
   }
 
   async getIntegration(id: string): Promise<Integration | undefined> {
-    const result = await db.select().from(schema.integrations).where(eq(schema.integrations.id, id));
+    const result = await this.db.select().from(schema.integrations).where(eq(schema.integrations.id, id));
     return result[0];
   }
 
   async createIntegration(insertIntegration: InsertIntegration): Promise<Integration> {
-    const result = await db.insert(schema.integrations).values(insertIntegration).returning();
+    const result = await this.db.insert(schema.integrations).values(insertIntegration).returning();
     return result[0];
   }
 
   async updateIntegration(id: string, updates: Partial<Integration>): Promise<Integration | undefined> {
-    const result = await db.update(schema.integrations)
+    const result = await this.db.update(schema.integrations)
       .set(updates)
       .where(eq(schema.integrations.id, id))
       .returning();
@@ -350,29 +357,29 @@ export class PostgresStorage implements IStorage {
   }
 
   async deleteIntegration(id: string): Promise<boolean> {
-    const result = await db.delete(schema.integrations).where(eq(schema.integrations.id, id)).returning();
+    const result = await this.db.delete(schema.integrations).where(eq(schema.integrations.id, id)).returning();
     return result.length > 0;
   }
 
   async getAutomations(userId: string): Promise<Automation[]> {
-    return await db.select()
+    return await this.db.select()
       .from(schema.automations)
       .where(eq(schema.automations.userId, userId))
       .orderBy(desc(schema.automations.createdAt));
   }
 
   async getAutomation(id: string): Promise<Automation | undefined> {
-    const result = await db.select().from(schema.automations).where(eq(schema.automations.id, id));
+    const result = await this.db.select().from(schema.automations).where(eq(schema.automations.id, id));
     return result[0];
   }
 
   async createAutomation(insertAutomation: InsertAutomation): Promise<Automation> {
-    const result = await db.insert(schema.automations).values(insertAutomation).returning();
+    const result = await this.db.insert(schema.automations).values(insertAutomation).returning();
     return result[0];
   }
 
   async updateAutomation(id: string, updates: Partial<Automation>): Promise<Automation | undefined> {
-    const result = await db.update(schema.automations)
+    const result = await this.db.update(schema.automations)
       .set(updates)
       .where(eq(schema.automations.id, id))
       .returning();
@@ -380,24 +387,24 @@ export class PostgresStorage implements IStorage {
   }
 
   async deleteAutomation(id: string): Promise<boolean> {
-    const result = await db.delete(schema.automations).where(eq(schema.automations.id, id)).returning();
+    const result = await this.db.delete(schema.automations).where(eq(schema.automations.id, id)).returning();
     return result.length > 0;
   }
 
   async getAuditLogs(adminId?: string): Promise<AuditLog[]> {
     if (adminId) {
-      return await db.select()
+      return await this.db.select()
         .from(schema.auditLogs)
         .where(eq(schema.auditLogs.adminId, adminId))
         .orderBy(desc(schema.auditLogs.createdAt));
     }
-    return await db.select()
+    return await this.db.select()
       .from(schema.auditLogs)
       .orderBy(desc(schema.auditLogs.createdAt));
   }
 
   async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
-    const result = await db.insert(schema.auditLogs).values(insertLog).returning();
+    const result = await this.db.insert(schema.auditLogs).values(insertLog).returning();
     return result[0];
   }
 }

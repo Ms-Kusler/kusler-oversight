@@ -1,0 +1,45 @@
+18:27:02.756 Running build in Washington, D.C., USA (East) – iad1
+18:27:02.756 Build machine configuration: 2 cores, 8 GB
+18:27:02.772 Cloning github.com/Ms-Kusler/kusler-oversight (Branch: main, Commit: f809291)
+18:27:09.744 Cloning completed: 6.972s
+18:27:09.880 Restored build cache from previous deployment (Bdh4wLyCAqyFoXUY5CsDCgrVAYLF)
+18:27:10.392 Running "vercel build"
+18:27:10.793 Vercel CLI 48.2.0
+18:27:11.376 Installing dependencies...
+18:27:12.605 
+18:27:12.605 up to date in 1s
+18:27:12.606 
+18:27:12.606 65 packages are looking for funding
+18:27:12.606   run `npm fund` for details
+18:27:12.638 Running "npm run build"
+18:27:12.747 
+18:27:12.747 > rest-express@1.0.0 build
+18:27:12.747 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+18:27:12.748 
+18:27:13.040 [36mvite v5.4.20 [32mbuilding for production...[36m[39m
+18:27:13.094 transforming...
+18:27:13.425 Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+18:27:13.426   npx update-browserslist-db@latest
+18:27:13.426   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+18:27:14.422 
+18:27:14.423 A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+18:27:20.136 [32m✓[39m 2543 modules transformed.
+18:27:20.720 rendering chunks...
+18:27:20.733 computing gzip size...
+18:27:20.756 [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  0.89 kB[22m[1m[22m[2m │ gzip:   0.48 kB[22m
+18:27:20.757 [2m../dist/public/[22m[2massets/[22m[35mindex-yV5_YQQj.css  [39m[1m[2m 80.45 kB[22m[1m[22m[2m │ gzip:  12.94 kB[22m
+18:27:20.757 [2m../dist/public/[22m[2massets/[22m[36mindex-qktOAvjM.js   [39m[1m[33m843.62 kB[39m[22m[2m │ gzip: 239.02 kB[22m
+18:27:20.757 [33m
+18:27:20.758 (!) Some chunks are larger than 500 kB after minification. Consider:
+18:27:20.758 - Using dynamic import() to code-split the application
+18:27:20.761 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+18:27:20.762 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+18:27:20.762 [32m✓ built in 7.69s[39m
+18:27:20.838 
+18:27:20.838   dist/index.js  54.2kb
+18:27:20.839 
+18:27:20.839 ⚡ Done in 12ms
+18:27:20.908 Build Completed in /vercel/output [10s]
+18:27:21.004 Deploying outputs...
+18:27:23.038 Deployment completed
+18:27:23.834 Creating build cache...
