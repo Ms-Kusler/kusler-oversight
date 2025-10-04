@@ -402,4 +402,7 @@ export class PostgresStorage implements IStorage {
   }
 }
 
-export const storage = process.env.DATABASE_URL ? new PostgresStorage() : new MemStorage();
+// Use PostgreSQL in production (Vercel), MemStorage in development (Replit)
+export const storage = process.env.NODE_ENV === 'production' && process.env.DATABASE_URL 
+  ? new PostgresStorage() 
+  : new MemStorage();
