@@ -21,27 +21,45 @@ app.use(session({
   }
 }));
 
-// Initialize
-(async () => {
-  await registerRoutes(app);
-  
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-  });
-  
-  // Serve static files in production
-  serveStatic(app);
-  
-  // Seed database once
-  try {
-    await seedAdminUser();
-    await seedDemoClient();
-  } catch (err) {
-    // Users might already exist - ignore
+// Shared initialization promise
+let initPromise: Promise<void> | null = null;
+
+async function initServer() {
+  if (!initPromise) {
+    initPromise = (async () => {
+      await registerRoutes(app);
+      
+      app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+        const status = err.status || err.statusCode || 500;
+        const message = err.message || "Internal Server Error";
+        res.status(status).json({ message });
+      });
+      
+      // Serve static files in production
+      serveStatic(app);
+      
+      // Seed database once
+      try {
+        await seedAdminUser();
+        await seedDemoClient();
+      } catch (err) {
+        // Users might already exist - ignore
+      }
+    })();
   }
-})();
+  return initPromise;
+}
+
+// Request-level guard: wait for initialization before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await initServer();
+    next();
+  } catch (err) {
+    console.error('Initialization error:', err);
+    res.status(500).json({ message: 'Server initialization failed' });
+  }
+});
 
 // Export app for Vercel
 export default app;
