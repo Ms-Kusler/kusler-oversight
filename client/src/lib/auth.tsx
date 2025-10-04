@@ -7,6 +7,12 @@ interface User {
   businessName: string | null;
   email: string;
   role: string;
+  emailPreferences?: {
+    weeklyReports: boolean;
+    lowCashAlerts: boolean;
+    overdueInvoices: boolean;
+    integrationFailures: boolean;
+  };
 }
 
 interface AuthContextType {

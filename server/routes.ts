@@ -29,7 +29,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: user.username,
         businessName: user.businessName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        emailPreferences: user.emailPreferences
       });
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
@@ -57,7 +58,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username: user.username,
         businessName: user.businessName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        emailPreferences: user.emailPreferences
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch user" });
@@ -92,6 +94,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: "Password changed successfully" });
     } catch (error) {
       res.status(500).json({ error: "Failed to change password" });
+    }
+  });
+
+  app.patch("/api/auth/email-preferences", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { weeklyReports, lowCashAlerts, overdueInvoices, integrationFailures } = req.body;
+      
+      const emailPreferences = {
+        weeklyReports: weeklyReports !== undefined ? weeklyReports : true,
+        lowCashAlerts: lowCashAlerts !== undefined ? lowCashAlerts : true,
+        overdueInvoices: overdueInvoices !== undefined ? overdueInvoices : true,
+        integrationFailures: integrationFailures !== undefined ? integrationFailures : true,
+      };
+      
+      await storage.updateUser(req.userId!, { emailPreferences });
+      
+      res.json({ success: true, emailPreferences });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update email preferences" });
     }
   });
 

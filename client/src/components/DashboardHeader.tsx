@@ -11,6 +11,7 @@ import { HelpCircle, MessageSquare, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import ChangePasswordDialog from "./ChangePasswordDialog";
+import EmailPreferencesDialog from "./EmailPreferencesDialog";
 
 interface DashboardHeaderProps {
   companyName?: string;
@@ -38,6 +39,7 @@ export default function DashboardHeader({ companyName = "Kusler Consulting" }: D
       </div>
       
       <div className="flex items-center gap-2">
+        {user?.role === 'client' && <EmailPreferencesDialog />}
         <ChangePasswordDialog />
         
         <DropdownMenu>

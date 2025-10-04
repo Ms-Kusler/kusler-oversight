@@ -12,6 +12,12 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("client"),
   isActive: boolean("is_active").notNull().default(true),
   lastLogin: timestamp("last_login"),
+  emailPreferences: jsonb("email_preferences").default({
+    weeklyReports: true,
+    lowCashAlerts: true,
+    overdueInvoices: true,
+    integrationFailures: true,
+  }),
 });
 
 export const integrations = pgTable("integrations", {
@@ -73,6 +79,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   businessName: true,
   email: true,
   role: true,
+  emailPreferences: true,
 });
 
 export const insertIntegrationSchema = createInsertSchema(integrations).omit({

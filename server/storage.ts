@@ -75,6 +75,12 @@ export class MemStorage implements IStorage {
       ...insertUser,
       businessName: insertUser.businessName ?? null,
       email: insertUser.email ?? null,
+      emailPreferences: insertUser.emailPreferences ?? {
+        weeklyReports: true,
+        lowCashAlerts: true,
+        overdueInvoices: true,
+        integrationFailures: true,
+      },
       role: insertUser.role ?? "client",
       isActive: true,
       lastLogin: null,
