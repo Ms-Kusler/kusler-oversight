@@ -64,6 +64,72 @@ export default function Reports() {
     document.body.removeChild(link);
   };
 
+  const handleExportTaxReport = () => {
+    const companyName = user?.businessName || "Kusler Consulting";
+    const today = new Date().toISOString().split('T')[0];
+    const currentYear = new Date().getFullYear();
+    
+    const totalIncome = monthlyData.reduce((sum, row) => sum + row.income, 0);
+    const totalExpenses = monthlyData.reduce((sum, row) => sum + row.expenses, 0);
+    const netIncome = totalIncome - totalExpenses;
+    
+    const expenseCategories = [
+      { category: 'Office Supplies', amount: 450, deductible: 'Yes' },
+      { category: 'Software & Subscriptions', amount: 495, deductible: 'Yes' },
+      { category: 'Professional Services', amount: 2800, deductible: 'Yes' },
+      { category: 'Marketing & Advertising', amount: 1250, deductible: 'Yes' },
+      { category: 'Travel & Meals (50%)', amount: 1205, deductible: 'Partial' },
+    ];
+    
+    const csvContent = [
+      [`${companyName} - Tax Report ${currentYear}`],
+      [`Tax Year: ${currentYear}`],
+      [`Generated: ${new Date().toLocaleDateString()}`],
+      [`Business Structure: Sole Proprietor/LLC (Schedule C)`],
+      [],
+      ['INCOME SUMMARY'],
+      ['Description', 'Amount'],
+      ['Gross Receipts (1099-NEC)', `$${totalIncome.toLocaleString()}`],
+      ['Returns and Allowances', '$0'],
+      ['Total Income', `$${totalIncome.toLocaleString()}`],
+      [],
+      ['DEDUCTIBLE EXPENSES'],
+      ['Category', 'Amount', 'Tax Deductible'],
+      ...expenseCategories.map(exp => [exp.category, `$${exp.amount.toLocaleString()}`, exp.deductible]),
+      ['Total Deductible Expenses', `$${expenseCategories.reduce((sum, e) => sum + e.amount, 0).toLocaleString()}`, ''],
+      [],
+      ['QUARTERLY BREAKDOWN'],
+      ['Quarter', 'Income', 'Expenses', 'Est. Tax Payment'],
+      ['Q1 (Jan-Mar)', `$${monthlyData[4]?.income || 0}`, `$${monthlyData[4]?.expenses || 0}`, 'See tax advisor'],
+      ['Q2 (Apr-Jun)', 'N/A', 'N/A', 'See tax advisor'],
+      ['Q3 (Jul-Sep)', `$${monthlyData[0]?.income || 0}`, `$${monthlyData[0]?.expenses || 0}`, 'See tax advisor'],
+      ['Q4 (Oct-Dec)', `$${(monthlyData[1]?.income || 0) + (monthlyData[2]?.income || 0) + (monthlyData[3]?.income || 0)}`, `$${(monthlyData[1]?.expenses || 0) + (monthlyData[2]?.expenses || 0) + (monthlyData[3]?.expenses || 0)}`, 'See tax advisor'],
+      [],
+      ['NET TAXABLE INCOME'],
+      ['Total Income', `$${totalIncome.toLocaleString()}`],
+      ['Less: Total Deductions', `($${expenseCategories.reduce((sum, e) => sum + e.amount, 0).toLocaleString()})`],
+      ['Net Profit (Schedule C Line 31)', `$${netIncome.toLocaleString()}`],
+      [],
+      ['NOTES'],
+      ['- This report is for informational purposes only'],
+      ['- Please consult with a qualified tax professional'],
+      ['- Self-employment tax applies to net profit'],
+      ['- Quarterly estimated taxes may be required'],
+      ['- Keep all receipts and supporting documentation'],
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${companyName.replace(/\s+/g, '_')}_Tax_Report_${currentYear}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
@@ -78,15 +144,26 @@ export default function Reports() {
             <h1 className="text-3xl sm:text-4xl font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-foreground/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
               Reports
             </h1>
-            <Button 
-              variant="outline" 
-              className="gap-2 backdrop-blur-xl bg-card/60 border-border/50"
-              onClick={handleExportReport}
-              data-testid="button-export"
-            >
-              <Download className="w-4 h-4" />
-              Export Report
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2 backdrop-blur-xl bg-card/60 border-border/50"
+                onClick={handleExportReport}
+                data-testid="button-export"
+              >
+                <Download className="w-4 h-4" />
+                Export Report
+              </Button>
+              <Button 
+                variant="outline" 
+                className="gap-2 backdrop-blur-xl bg-card/60 border-border/50"
+                onClick={handleExportTaxReport}
+                data-testid="button-export-tax"
+              >
+                <Download className="w-4 h-4" />
+                Tax Report
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
