@@ -14,7 +14,7 @@ export default function MetricCard({ title, value, subtitle, progress, className
   return (
     <Card 
       className={cn(
-        "p-6 space-y-3 relative overflow-hidden backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl transition-all duration-300 hover-elevate",
+        "p-4 sm:p-6 space-y-2 sm:space-y-3 relative overflow-hidden backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl transition-all duration-300 hover-elevate",
         className
       )} 
       data-testid={`card-${title.toLowerCase().replace(/\s+/g, '-')}`}
@@ -42,7 +42,7 @@ export default function MetricCard({ title, value, subtitle, progress, className
       
       <div className="space-y-1 relative z-10">
         <p 
-          className="text-5xl font-bold font-mono tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent"
+          className="text-4xl sm:text-5xl font-bold font-mono tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent"
           data-testid={`text-${title.toLowerCase().replace(/\s+/g, '-')}-value`}
         >
           {value}

@@ -10,7 +10,7 @@ interface BillsCardProps {
 export default function BillsCard({ invoicesDue, overdue }: BillsCardProps) {
   return (
     <Card 
-      className="p-6 space-y-4 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl relative overflow-hidden hover-elevate transition-all duration-300" 
+      className="p-4 sm:p-6 space-y-3 sm:space-y-4 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl relative overflow-hidden hover-elevate transition-all duration-300" 
       data-testid="card-bills"
     >
       {overdue > 0 && (
@@ -27,10 +27,10 @@ export default function BillsCard({ invoicesDue, overdue }: BillsCardProps) {
       <div className="space-y-3 relative z-10">
         <div>
           <div className="flex items-baseline gap-2">
-            <span className="text-6xl font-bold font-mono bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <span className="text-5xl sm:text-6xl font-bold font-mono bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
               {invoicesDue}
             </span>
-            <span className="text-base text-foreground/80">invoices</span>
+            <span className="text-sm sm:text-base text-foreground/80">invoices</span>
           </div>
           <p className="text-sm text-muted-foreground/80 mt-1">due soon</p>
         </div>

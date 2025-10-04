@@ -28,21 +28,21 @@ export default function Dashboard() {
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
       
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '4s' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-chart-2/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-chart-2/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
       
-      <div className="relative z-10">
+      <div className="relative z-10 max-w-7xl mx-auto">
         <DashboardHeader companyName="Kusler Consulting" />
         
-        <main className="px-4 space-y-6 pb-6 pt-4">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold uppercase tracking-[0.2em] text-foreground/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+        <main className="px-4 space-y-5 pb-6 pt-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 className="text-3xl sm:text-4xl font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-foreground/90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
               Operations Hub
             </h1>
             <TimePeriodSelector value={period} onChange={setPeriod} />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <MetricCard 
               title="Money In & Out"
               value="$8,400"
@@ -53,7 +53,7 @@ export default function Dashboard() {
             <BillsCard invoicesDue={3} overdue={1} />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <MetricCard 
               title="Available Cash"
               value="$12,560"

@@ -11,7 +11,7 @@ interface ProfitChartProps {
 export default function ProfitChart({ percentage, trend, data }: ProfitChartProps) {
   return (
     <Card 
-      className="p-6 space-y-4 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl relative overflow-hidden hover-elevate transition-all duration-300" 
+      className="p-4 sm:p-6 space-y-3 sm:space-y-4 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl relative overflow-hidden hover-elevate transition-all duration-300" 
       data-testid="card-profit"
     >
       <div 
@@ -44,17 +44,17 @@ export default function ProfitChart({ percentage, trend, data }: ProfitChartProp
         </ResponsiveContainer>
       </div>
       
-      <div className="flex items-center gap-3 relative z-10">
+      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
         {trend === 'up' ? (
-          <TrendingUp className="w-6 h-6 text-chart-2" />
+          <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-chart-2" />
         ) : (
-          <TrendingDown className="w-6 h-6 text-chart-5" />
+          <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-chart-5" />
         )}
-        <div className="flex items-baseline gap-2">
-          <span className={`text-3xl font-bold font-mono ${trend === 'up' ? 'text-chart-2' : 'text-chart-5'}`}>
+        <div className="flex items-baseline gap-1 sm:gap-2">
+          <span className={`text-2xl sm:text-3xl font-bold font-mono ${trend === 'up' ? 'text-chart-2' : 'text-chart-5'}`}>
             {trend === 'up' ? 'Up' : 'Down'} {percentage}%
           </span>
-          <span className="text-sm text-muted-foreground/70">Vs. month</span>
+          <span className="text-xs sm:text-sm text-muted-foreground/70">Vs. month</span>
         </div>
       </div>
     </Card>
