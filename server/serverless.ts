@@ -51,6 +51,7 @@ app.use((req, res, next) => {
 
 // Initialize the app
 let initialized = false;
+let seeded = false;
 
 async function initialize() {
   if (initialized) return;
@@ -67,13 +68,17 @@ async function initialize() {
   // Serve static files in production
   serveStatic(app);
 
-  // Seed database on first request
-  try {
-    await seedAdminUser();
-    await seedDemoClient();
-    log('Database seeded successfully');
-  } catch (err) {
-    log(`Seed error: ${err}`);
+  // Seed database once (idempotent)
+  if (!seeded) {
+    seeded = true;
+    try {
+      await seedAdminUser();
+      await seedDemoClient();
+      log('Database seeded successfully');
+    } catch (err: any) {
+      log(`Seed warning: ${err.message}`);
+      // Don't fail if seed fails - users might already exist
+    }
   }
 }
 

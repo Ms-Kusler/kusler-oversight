@@ -260,33 +260,41 @@ import * as schema from '@shared/schema';
 import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 
 export class PostgresStorage implements IStorage {
-  private db: NeonHttpDatabase<typeof schema>;
+  private db!: NeonHttpDatabase<typeof schema>;
+  private initialized = false;
 
-  constructor() {
-    // Lazy-load db connection only when PostgresStorage is instantiated
-    const { db } = require('./db');
-    this.db = db;
+  private async ensureDb() {
+    if (!this.initialized) {
+      const { db } = await import('./db.js');
+      this.db = db;
+      this.initialized = true;
+    }
   }
   async getUser(id: string): Promise<User | undefined> {
+    await this.ensureDb();
     const result = await this.db.select().from(schema.users).where(eq(schema.users.id, id));
     return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
+    await this.ensureDb();
     const result = await this.db.select().from(schema.users).where(eq(schema.users.username, username));
     return result[0];
   }
 
   async getAllUsers(): Promise<User[]> {
+    await this.ensureDb();
     return await this.db.select().from(schema.users);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.users).values(insertUser).returning();
     return result[0];
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    await this.ensureDb();
     const result = await this.db.update(schema.users)
       .set(updates)
       .where(eq(schema.users.id, id))
@@ -295,6 +303,7 @@ export class PostgresStorage implements IStorage {
   }
 
   async getTransactions(userId: string): Promise<Transaction[]> {
+    await this.ensureDb();
     return await this.db.select()
       .from(schema.transactions)
       .where(eq(schema.transactions.userId, userId))
@@ -302,11 +311,13 @@ export class PostgresStorage implements IStorage {
   }
 
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.transactions).values(insertTransaction).returning();
     return result[0];
   }
 
   async getInvoices(userId: string): Promise<Invoice[]> {
+    await this.ensureDb();
     return await this.db.select()
       .from(schema.invoices)
       .where(eq(schema.invoices.userId, userId))
@@ -314,16 +325,19 @@ export class PostgresStorage implements IStorage {
   }
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
+    await this.ensureDb();
     const result = await this.db.select().from(schema.invoices).where(eq(schema.invoices.id, id));
     return result[0];
   }
 
   async createInvoice(insertInvoice: InsertInvoice): Promise<Invoice> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.invoices).values(insertInvoice).returning();
     return result[0];
   }
 
   async updateInvoice(id: string, updates: Partial<Invoice>): Promise<Invoice | undefined> {
+    await this.ensureDb();
     const result = await this.db.update(schema.invoices)
       .set(updates)
       .where(eq(schema.invoices.id, id))
@@ -332,6 +346,7 @@ export class PostgresStorage implements IStorage {
   }
 
   async getIntegrations(userId: string): Promise<Integration[]> {
+    await this.ensureDb();
     return await this.db.select()
       .from(schema.integrations)
       .where(eq(schema.integrations.userId, userId))
@@ -339,16 +354,19 @@ export class PostgresStorage implements IStorage {
   }
 
   async getIntegration(id: string): Promise<Integration | undefined> {
+    await this.ensureDb();
     const result = await this.db.select().from(schema.integrations).where(eq(schema.integrations.id, id));
     return result[0];
   }
 
   async createIntegration(insertIntegration: InsertIntegration): Promise<Integration> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.integrations).values(insertIntegration).returning();
     return result[0];
   }
 
   async updateIntegration(id: string, updates: Partial<Integration>): Promise<Integration | undefined> {
+    await this.ensureDb();
     const result = await this.db.update(schema.integrations)
       .set(updates)
       .where(eq(schema.integrations.id, id))
@@ -357,11 +375,13 @@ export class PostgresStorage implements IStorage {
   }
 
   async deleteIntegration(id: string): Promise<boolean> {
+    await this.ensureDb();
     const result = await this.db.delete(schema.integrations).where(eq(schema.integrations.id, id)).returning();
     return result.length > 0;
   }
 
   async getAutomations(userId: string): Promise<Automation[]> {
+    await this.ensureDb();
     return await this.db.select()
       .from(schema.automations)
       .where(eq(schema.automations.userId, userId))
@@ -369,16 +389,19 @@ export class PostgresStorage implements IStorage {
   }
 
   async getAutomation(id: string): Promise<Automation | undefined> {
+    await this.ensureDb();
     const result = await this.db.select().from(schema.automations).where(eq(schema.automations.id, id));
     return result[0];
   }
 
   async createAutomation(insertAutomation: InsertAutomation): Promise<Automation> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.automations).values(insertAutomation).returning();
     return result[0];
   }
 
   async updateAutomation(id: string, updates: Partial<Automation>): Promise<Automation | undefined> {
+    await this.ensureDb();
     const result = await this.db.update(schema.automations)
       .set(updates)
       .where(eq(schema.automations.id, id))
@@ -387,11 +410,13 @@ export class PostgresStorage implements IStorage {
   }
 
   async deleteAutomation(id: string): Promise<boolean> {
+    await this.ensureDb();
     const result = await this.db.delete(schema.automations).where(eq(schema.automations.id, id)).returning();
     return result.length > 0;
   }
 
   async getAuditLogs(adminId?: string): Promise<AuditLog[]> {
+    await this.ensureDb();
     if (adminId) {
       return await this.db.select()
         .from(schema.auditLogs)
@@ -404,6 +429,7 @@ export class PostgresStorage implements IStorage {
   }
 
   async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
+    await this.ensureDb();
     const result = await this.db.insert(schema.auditLogs).values(insertLog).returning();
     return result[0];
   }
