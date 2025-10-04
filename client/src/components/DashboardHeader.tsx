@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { HelpCircle, MessageSquare, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/lib/auth";
+import ChangePasswordDialog from "./ChangePasswordDialog";
 
 interface DashboardHeaderProps {
   companyName?: string;
@@ -16,6 +18,12 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ companyName = "Kusler Consulting" }: DashboardHeaderProps) {
   const [, setLocation] = useLocation();
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    setLocation('/login');
+  };
 
   return (
     <header className="flex items-center justify-between px-4 py-2 backdrop-blur-sm sticky top-0 z-40 bg-background/80">
@@ -29,37 +37,46 @@ export default function DashboardHeader({ companyName = "Kusler Consulting" }: D
         </span>
       </div>
       
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            size="icon" 
-            variant="ghost"
-            data-testid="button-menu"
-            className="hover-elevate active-elevate-2 h-8 w-8"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="backdrop-blur-xl bg-popover/95 border-popover-border/50">
-          <DropdownMenuItem onClick={() => setLocation('/faq')} data-testid="menu-faq">
-            <HelpCircle className="w-4 h-4 mr-2" />
-            Help & FAQ
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => console.log('Request assistance')} data-testid="menu-request-assistance">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Request Developer Assistance
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => console.log('Settings')} data-testid="menu-settings">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => console.log('Logout')} data-testid="menu-logout">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-2">
+        <ChangePasswordDialog />
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              size="icon" 
+              variant="ghost"
+              data-testid="button-menu"
+              className="hover-elevate active-elevate-2 h-8 w-8"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="backdrop-blur-xl bg-popover/95 border-popover-border/50">
+            <DropdownMenuItem onClick={() => setLocation('/faq')} data-testid="menu-faq">
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Help & FAQ
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log('Request assistance')} data-testid="menu-request-assistance">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Request Developer Assistance
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {user?.role === 'admin' && (
+              <>
+                <DropdownMenuItem onClick={() => setLocation('/admin')} data-testid="menu-admin">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Admin Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuItem onClick={handleLogout} data-testid="menu-logout">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }

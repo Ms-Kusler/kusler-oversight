@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIntegrationSchema, insertAutomationSchema } from "@shared/schema";
 import { requireAuth, requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
-import { authenticateUser, hashPassword } from "./auth";
+import { authenticateUser, hashPassword, verifyPassword } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -61,6 +61,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
+  app.post("/api/auth/change-password", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current and new password required" });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "New password must be at least 6 characters" });
+      }
+      
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const isValidPassword = await verifyPassword(currentPassword, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "Current password is incorrect" });
+      }
+      
+      const hashedNewPassword = await hashPassword(newPassword);
+      await storage.updateUser(req.userId!, { password: hashedNewPassword });
+      
+      res.json({ success: true, message: "Password changed successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to change password" });
     }
   });
 
