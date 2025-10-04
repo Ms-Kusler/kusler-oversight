@@ -1,10 +1,11 @@
-import { type User, type InsertUser, type Transaction, type InsertTransaction, type Invoice, type InsertInvoice, type Integration, type InsertIntegration, type Automation, type InsertAutomation } from "@shared/schema";
+import { type User, type InsertUser, type Transaction, type InsertTransaction, type Invoice, type InsertInvoice, type Integration, type InsertIntegration, type Automation, type InsertAutomation, type AuditLog, type InsertAuditLog } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   
@@ -31,6 +32,10 @@ export interface IStorage {
   createAutomation(automation: InsertAutomation): Promise<Automation>;
   updateAutomation(id: string, updates: Partial<Automation>): Promise<Automation | undefined>;
   deleteAutomation(id: string): Promise<boolean>;
+  
+  // Audit log methods
+  getAuditLogs(adminId?: string): Promise<AuditLog[]>;
+  createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
 }
 
 export class MemStorage implements IStorage {
@@ -39,6 +44,7 @@ export class MemStorage implements IStorage {
   private invoices: Map<string, Invoice>;
   private integrations: Map<string, Integration>;
   private automations: Map<string, Automation>;
+  private auditLogs: Map<string, AuditLog>;
 
   constructor() {
     this.users = new Map();
@@ -46,6 +52,7 @@ export class MemStorage implements IStorage {
     this.invoices = new Map();
     this.integrations = new Map();
     this.automations = new Map();
+    this.auditLogs = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -58,12 +65,19 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const user: User = { 
       ...insertUser,
       businessName: insertUser.businessName ?? null,
       email: insertUser.email ?? null,
+      role: insertUser.role ?? "client",
+      isActive: true,
+      lastLogin: null,
       id 
     };
     this.users.set(id, user);
@@ -208,6 +222,30 @@ export class MemStorage implements IStorage {
 
   async deleteAutomation(id: string): Promise<boolean> {
     return this.automations.delete(id);
+  }
+
+  async getAuditLogs(adminId?: string): Promise<AuditLog[]> {
+    const logs = Array.from(this.auditLogs.values());
+    if (adminId) {
+      return logs.filter(log => log.adminId === adminId);
+    }
+    return logs.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async createAuditLog(insertLog: InsertAuditLog): Promise<AuditLog> {
+    const id = randomUUID();
+    const log: AuditLog = {
+      ...insertLog,
+      targetUserId: insertLog.targetUserId ?? null,
+      details: insertLog.details ?? null,
+      ipAddress: insertLog.ipAddress ?? null,
+      id,
+      createdAt: new Date()
+    };
+    this.auditLogs.set(id, log);
+    return log;
   }
 }
 

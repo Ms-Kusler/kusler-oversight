@@ -2,9 +2,123 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIntegrationSchema, insertAutomationSchema } from "@shared/schema";
+import { requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const MOCK_USER_ID = "demo-user";
+
+  app.get("/api/admin/users", requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const clientUsers = users.filter(u => u.role === 'client');
+      
+      await logAdminAction(
+        req.userId!,
+        'view_all_users',
+        undefined,
+        { count: clientUsers.length },
+        req.ip
+      );
+      
+      const usersWithHealth = await Promise.all(clientUsers.map(async (user) => {
+        const integrations = await storage.getIntegrations(user.id);
+        const connectedCount = integrations.filter(i => i.isConnected).length;
+        
+        return {
+          id: user.id,
+          businessName: user.businessName,
+          email: user.email,
+          username: user.username,
+          lastLogin: user.lastLogin,
+          isActive: user.isActive,
+          integrationsCount: connectedCount,
+          health: connectedCount > 0 ? 'healthy' : 'needs_setup'
+        };
+      }));
+      
+      res.json(usersWithHealth);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/admin/users/:id", requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      await logAdminAction(
+        req.userId!,
+        'view_user',
+        id,
+        { username: user.username },
+        req.ip
+      );
+      
+      const [integrations, transactions, invoices] = await Promise.all([
+        storage.getIntegrations(id),
+        storage.getTransactions(id),
+        storage.getInvoices(id)
+      ]);
+      
+      res.json({
+        user: {
+          id: user.id,
+          businessName: user.businessName,
+          email: user.email,
+          username: user.username,
+          lastLogin: user.lastLogin,
+          isActive: user.isActive
+        },
+        integrations,
+        stats: {
+          transactionsCount: transactions.length,
+          invoicesCount: invoices.length,
+          integrationsCount: integrations.filter(i => i.isConnected).length
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user details" });
+    }
+  });
+
+  app.get("/api/admin/audit-logs", requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const logs = await storage.getAuditLogs();
+      res.json(logs.slice(0, 100));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch audit logs" });
+    }
+  });
+
+  app.post("/api/admin/users/:id/toggle-active", requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const updated = await storage.updateUser(id, { isActive: !user.isActive });
+      
+      await logAdminAction(
+        req.userId!,
+        user.isActive ? 'deactivate_user' : 'activate_user',
+        id,
+        { username: user.username },
+        req.ip
+      );
+      
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to toggle user status" });
+    }
+  });
 
   // Dashboard data endpoint
   app.get("/api/dashboard", async (req, res) => {

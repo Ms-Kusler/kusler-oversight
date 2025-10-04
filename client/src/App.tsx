@@ -8,6 +8,7 @@ import Finances from "@/pages/Finances";
 import Workflows from "@/pages/Workflows";
 import Reports from "@/pages/Reports";
 import FAQ from "@/pages/FAQ";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/workflows" component={Workflows} />
       <Route path="/reports" component={Reports} />
       <Route path="/faq" component={FAQ} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
