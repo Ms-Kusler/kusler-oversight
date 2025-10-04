@@ -9,6 +9,9 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   businessName: text("business_name"),
   email: text("email"),
+  role: text("role").notNull().default("client"),
+  isActive: boolean("is_active").notNull().default(true),
+  lastLogin: timestamp("last_login"),
 });
 
 export const integrations = pgTable("integrations", {
@@ -29,6 +32,16 @@ export const automations = pgTable("automations", {
   isActive: boolean("is_active").notNull().default(true),
   config: jsonb("config"),
   lastRun: timestamp("last_run"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  adminId: varchar("admin_id").notNull().references(() => users.id),
+  targetUserId: varchar("target_user_id").references(() => users.id),
+  action: text("action").notNull(),
+  details: jsonb("details"),
+  ipAddress: text("ip_address"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -59,6 +72,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   businessName: true,
   email: true,
+  role: true,
 });
 
 export const insertIntegrationSchema = createInsertSchema(integrations).omit({
@@ -71,6 +85,11 @@ export const insertAutomationSchema = createInsertSchema(automations).omit({
   id: true,
   createdAt: true,
   lastRun: true,
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
@@ -88,6 +107,8 @@ export type InsertIntegration = z.infer<typeof insertIntegrationSchema>;
 export type Integration = typeof integrations.$inferSelect;
 export type InsertAutomation = z.infer<typeof insertAutomationSchema>;
 export type Automation = typeof automations.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
