@@ -29,6 +29,41 @@ export default function Reports() {
 
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))'];
 
+  const handleExportReport = () => {
+    const companyName = user?.businessName || "Kusler Consulting";
+    const today = new Date().toISOString().split('T')[0];
+    
+    const csvContent = [
+      [`${companyName} - Financial Report`],
+      [`Generated: ${new Date().toLocaleDateString()}`],
+      [],
+      ['Monthly Cash Flow'],
+      ['Month', 'Income', 'Expenses', 'Net Profit'],
+      ...monthlyData.map(row => [row.month, row.income, row.expenses, row.income - row.expenses]),
+      [],
+      ['Income by Category'],
+      ['Category', 'Amount'],
+      ...categoryData.map(row => [row.name, row.value]),
+      [],
+      ['Summary Metrics'],
+      ['Metric', 'Value'],
+      ['Revenue Growth', '+21%'],
+      ['Avg. Payment Time', '12 days'],
+      ['Profit Margin', '26%'],
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${companyName.replace(/\s+/g, '_')}_Report_${today}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
@@ -46,7 +81,7 @@ export default function Reports() {
             <Button 
               variant="outline" 
               className="gap-2 backdrop-blur-xl bg-card/60 border-border/50"
-              onClick={() => console.log('Export report')}
+              onClick={handleExportReport}
               data-testid="button-export"
             >
               <Download className="w-4 h-4" />
