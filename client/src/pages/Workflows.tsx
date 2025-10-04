@@ -1,29 +1,84 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import type { Integration, Automation } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import DashboardHeader from "@/components/DashboardHeader";
 import BottomNav from "@/components/BottomNav";
 import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Zap, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Zap, CheckCircle2, Clock, AlertCircle, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const AVAILABLE_PLATFORMS = [
+  { id: 'quickbooks', name: 'QuickBooks', description: 'Accounting & invoicing' },
+  { id: 'stripe', name: 'Stripe', description: 'Payment processing' },
+  { id: 'paypal', name: 'PayPal', description: 'Payment processing' },
+  { id: 'asana', name: 'Asana', description: 'Project management' },
+  { id: 'monday', name: 'Monday.com', description: 'Project management' },
+  { id: 'xero', name: 'Xero', description: 'Accounting' },
+];
 
 export default function Workflows() {
   const [activePage, setActivePage] = useState("workflows");
+  const { toast } = useToast();
 
-  //todo: remove mock functionality
-  const workflows = [
-    { id: 1, name: 'Weekly Operations Brief', description: 'Email summary every Monday at 8AM', status: 'active', runs: 42 },
-    { id: 2, name: 'Invoice Payment Sync', description: 'Update when payments received', status: 'active', runs: 156 },
-    { id: 3, name: 'Low Cash Alert', description: 'Notify when cash below threshold', status: 'paused', runs: 3 },
-    { id: 4, name: 'Expense Auto-Logger', description: 'Log expenses from connected apps', status: 'active', runs: 89 },
-  ];
+  const { data: integrations = [] } = useQuery<Integration[]>({
+    queryKey: ['/api/integrations'],
+  });
 
-  const integrations = [
-    { name: 'QuickBooks', status: 'connected', lastSync: '2 hours ago' },
-    { name: 'Stripe', status: 'connected', lastSync: '15 minutes ago' },
-    { name: 'Gmail', status: 'connected', lastSync: '1 hour ago' },
-    { name: 'Google Drive', status: 'disconnected', lastSync: 'Never' },
-  ];
+  const { data: automations = [] } = useQuery<Automation[]>({
+    queryKey: ['/api/automations'],
+  });
+
+  const connectMutation = useMutation({
+    mutationFn: async (platform: string) => {
+      const MOCK_USER_ID = "demo-user";
+      return await apiRequest('/api/integrations', 'POST', {
+        userId: MOCK_USER_ID,
+        platform,
+        isConnected: true
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/integrations'] });
+      toast({
+        title: "Integration connected",
+        description: "Your integration has been connected successfully.",
+      });
+    }
+  });
+
+  const disconnectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest(`/api/integrations/${id}`, 'DELETE');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/integrations'] });
+      toast({
+        title: "Integration disconnected",
+        description: "Your integration has been disconnected.",
+      });
+    }
+  });
+
+  const getIntegrationStatus = (platformId: string) => {
+    return integrations.find(i => i.platform.toLowerCase() === platformId.toLowerCase());
+  };
+
+  const formatLastSync = (date: Date | null) => {
+    if (!date) return 'Never';
+    const now = new Date();
+    const diff = now.getTime() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} minutes ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hours ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} days ago`;
+  };
 
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
@@ -47,88 +102,97 @@ export default function Workflows() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Zap className="w-5 h-5 text-chart-3" />
-                  <h3 className="font-semibold">Automation Status</h3>
+                  <h3 className="font-semibold">Integration Status</h3>
                 </div>
-                <p className="text-2xl font-bold font-mono">{workflows.filter(w => w.status === 'active').length} Active</p>
-                <p className="text-xs text-muted-foreground mt-1">{workflows.reduce((sum, w) => sum + w.runs, 0)} total runs this month</p>
+                <p className="text-2xl font-bold font-mono" data-testid="text-connected-count">{integrations.filter(i => i.isConnected).length} Connected</p>
+                <p className="text-xs text-muted-foreground mt-1">{integrations.length} total integrations</p>
               </div>
-              <Button variant="default" onClick={() => console.log('Create workflow')} data-testid="button-new-workflow">
-                New Workflow
-              </Button>
             </div>
           </Card>
 
+          {automations.length > 0 && (
+            <Card className="backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl">
+              <div className="p-4 sm:p-5 border-b border-border/50">
+                <h2 className="font-semibold text-lg">Active Automations</h2>
+              </div>
+              <div className="divide-y divide-border/30">
+                {automations.map((automation) => (
+                  <div key={automation.id} className="p-4 hover-elevate transition-all duration-200" data-testid={`automation-${automation.id}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-medium">{automation.name}</h3>
+                          <Badge 
+                            variant={automation.isActive ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {automation.isActive ? 'active' : 'paused'}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{automation.type}</p>
+                        {automation.lastRun && (
+                          <div className="flex items-center gap-1 mt-2">
+                            <Clock className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">Last run: {formatLastSync(automation.lastRun)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
           <Card className="backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl">
             <div className="p-4 sm:p-5 border-b border-border/50">
-              <h2 className="font-semibold text-lg">Active Workflows</h2>
+              <h2 className="font-semibold text-lg">Available Integrations</h2>
+              <p className="text-sm text-muted-foreground mt-1">Connect your business tools to sync data automatically</p>
             </div>
             <div className="divide-y divide-border/30">
-              {workflows.map((workflow) => (
-                <div key={workflow.id} className="p-4 hover-elevate transition-all duration-200" data-testid={`workflow-${workflow.id}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium">{workflow.name}</h3>
-                        <Badge 
-                          variant={workflow.status === 'active' ? 'default' : 'secondary'}
-                          className="text-xs"
-                        >
-                          {workflow.status}
-                        </Badge>
+              {AVAILABLE_PLATFORMS.map((platform) => {
+                const integration = getIntegrationStatus(platform.id);
+                const isConnected = integration?.isConnected || false;
+                
+                return (
+                  <div key={platform.id} className="p-4 hover-elevate transition-all duration-200 flex items-center justify-between" data-testid={`integration-${platform.id}`}>
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`p-2 rounded-lg ${isConnected ? 'bg-chart-2/10' : 'bg-muted/50'}`}>
+                        {isConnected ? (
+                          <CheckCircle2 className="w-4 h-4 text-chart-2" />
+                        ) : (
+                          <Plus className="w-4 h-4 text-muted-foreground" />
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground">{workflow.description}</p>
-                      <div className="flex items-center gap-1 mt-2">
-                        <CheckCircle2 className="w-3 h-3 text-chart-2" />
-                        <span className="text-xs text-muted-foreground">{workflow.runs} successful runs</span>
+                      <div className="flex-1">
+                        <p className="font-medium">{platform.name}</p>
+                        <p className="text-xs text-muted-foreground">{platform.description}</p>
+                        {isConnected && integration?.lastSynced && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <Clock className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">Last sync: {formatLastSync(integration.lastSynced)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <Button 
-                      variant="ghost" 
+                      variant={isConnected ? 'outline' : 'default'}
                       size="sm"
-                      onClick={() => console.log(`Edit workflow ${workflow.id}`)}
-                      data-testid={`button-edit-workflow-${workflow.id}`}
+                      onClick={() => {
+                        if (isConnected && integration) {
+                          disconnectMutation.mutate(integration.id);
+                        } else {
+                          connectMutation.mutate(platform.id);
+                        }
+                      }}
+                      disabled={connectMutation.isPending || disconnectMutation.isPending}
+                      data-testid={`button-toggle-${platform.id}`}
                     >
-                      Edit
+                      {isConnected ? 'Disconnect' : 'Connect'}
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl">
-            <div className="p-4 sm:p-5 border-b border-border/50">
-              <h2 className="font-semibold text-lg">Connected Integrations</h2>
-            </div>
-            <div className="divide-y divide-border/30">
-              {integrations.map((integration, idx) => (
-                <div key={idx} className="p-4 hover-elevate transition-all duration-200 flex items-center justify-between" data-testid={`integration-${integration.name.toLowerCase()}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${integration.status === 'connected' ? 'bg-chart-2/10' : 'bg-muted/50'}`}>
-                      {integration.status === 'connected' ? (
-                        <CheckCircle2 className="w-4 h-4 text-chart-2" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium">{integration.name}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Clock className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Last sync: {integration.lastSync}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button 
-                    variant={integration.status === 'connected' ? 'outline' : 'default'}
-                    size="sm"
-                    onClick={() => console.log(`Toggle ${integration.name}`)}
-                    data-testid={`button-toggle-${integration.name.toLowerCase()}`}
-                  >
-                    {integration.status === 'connected' ? 'Disconnect' : 'Connect'}
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
         </main>
