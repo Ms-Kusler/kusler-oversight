@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import BottomNav from "@/components/BottomNav";
+import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -134,6 +135,7 @@ export default function Finances() {
         </main>
 
         <BottomNav active={activePage} onNavigate={setActivePage} />
+        <DebugPanel />
       </div>
     </div>
   );

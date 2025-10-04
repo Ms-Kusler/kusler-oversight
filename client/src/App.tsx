@@ -7,6 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Finances from "@/pages/Finances";
 import Workflows from "@/pages/Workflows";
 import Reports from "@/pages/Reports";
+import FAQ from "@/pages/FAQ";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/finances" component={Finances} />
       <Route path="/workflows" component={Workflows} />
       <Route path="/reports" component={Reports} />
+      <Route path="/faq" component={FAQ} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -8,6 +8,10 @@ import SystemStatus from "@/components/SystemStatus";
 import ActionButtons from "@/components/ActionButtons";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
+import AIAssistant from "@/components/AIAssistant";
+import ProjectUpdates from "@/components/ProjectUpdates";
+import SecurityStatus from "@/components/SecurityStatus";
+import DebugPanel from "@/components/DebugPanel";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("home");
@@ -63,6 +67,13 @@ export default function Dashboard() {
             <ProfitChart percentage={14} trend="up" data={profitData} />
           </div>
 
+          <div className="grid gap-3 sm:gap-4">
+            <AIAssistant />
+            <ProjectUpdates />
+          </div>
+
+          <SecurityStatus />
+          
           <SystemStatus />
 
           <ActionButtons />
@@ -71,6 +82,7 @@ export default function Dashboard() {
         </main>
 
         <BottomNav active={activePage} onNavigate={setActivePage} />
+        <DebugPanel />
       </div>
     </div>
   );

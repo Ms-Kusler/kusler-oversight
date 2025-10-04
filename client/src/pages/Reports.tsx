@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import BottomNav from "@/components/BottomNav";
+import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
@@ -174,6 +175,7 @@ export default function Reports() {
         </main>
 
         <BottomNav active={activePage} onNavigate={setActivePage} />
+        <DebugPanel />
       </div>
     </div>
   );
