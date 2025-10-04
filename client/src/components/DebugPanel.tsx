@@ -61,7 +61,7 @@ export default function DebugPanel() {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 max-w-md" data-testid="debug-panel">
+    <div className="hidden sm:block fixed bottom-20 right-4 z-50 max-w-md" data-testid="debug-panel">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button
