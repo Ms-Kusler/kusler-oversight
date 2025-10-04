@@ -29,19 +29,23 @@ export default function TimePeriodSelector({ value = "This Month", onChange }: T
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="gap-2 font-normal"
+          className="gap-2 font-normal backdrop-blur-xl bg-card/60 border-border/50 hover-elevate active-elevate-2 transition-all duration-300"
           data-testid="button-period-selector"
         >
           {selected}
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4 transition-transform duration-300 data-[state=open]:rotate-180" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent 
+        align="start"
+        className="backdrop-blur-xl bg-popover/95 border-popover-border/50"
+      >
         {periods.map((period) => (
           <DropdownMenuItem
             key={period}
             onClick={() => handleSelect(period)}
             data-testid={`option-${period.toLowerCase().replace(/\s+/g, '-')}`}
+            className="hover-elevate transition-all duration-200"
           >
             {period}
           </DropdownMenuItem>

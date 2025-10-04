@@ -24,40 +24,51 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
-      <DashboardHeader companyName="Kusler Consulting" />
+    <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
       
-      <main className="px-4 space-y-6 pb-6">
-        <div>
-          <h1 className="text-4xl font-bold mb-4">Operations Hub</h1>
-          <TimePeriodSelector value={period} onChange={setPeriod} />
-        </div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '4s' }} />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-chart-2/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      
+      <div className="relative z-10">
+        <DashboardHeader companyName="Kusier Consulting" />
+        
+        <main className="px-4 space-y-6 pb-6">
+          <div className="space-y-3">
+            <h1 className="text-4xl font-bold bg-gradient-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent">
+              Operations Hub
+            </h1>
+            <TimePeriodSelector value={period} onChange={setPeriod} />
+          </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <MetricCard 
-            title="Money In & Out"
-            value="$8,400"
-            subtitle="$ 6,200 spent"
-            progress={57}
-          />
-          <BillsCard invoicesDue={3} overdue={1} />
-        </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <MetricCard 
+              title="Money In & Out"
+              value="$8,400"
+              subtitle="$ 6,200 spent"
+              progress={57}
+              glowColor="hsl(var(--chart-1))"
+            />
+            <BillsCard invoicesDue={3} overdue={1} />
+          </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <MetricCard 
-            title="Available Cash"
-            value="$12,560"
-            subtitle="available"
-          />
-          <ProfitChart percentage={14} trend="up" data={profitData} />
-        </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <MetricCard 
+              title="Available Cash"
+              value="$12,560"
+              subtitle="available"
+              glowColor="hsl(var(--chart-2))"
+            />
+            <ProfitChart percentage={14} trend="up" data={profitData} />
+          </div>
 
-        <SystemStatus />
+          <SystemStatus />
 
-        <ActionButtons />
-      </main>
+          <ActionButtons />
+        </main>
 
-      <BottomNav active={activePage} onNavigate={setActivePage} />
+        <BottomNav active={activePage} onNavigate={setActivePage} />
+      </div>
     </div>
   );
 }
