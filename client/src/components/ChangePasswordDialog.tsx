@@ -76,9 +76,9 @@ export default function ChangePasswordDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" data-testid="button-change-password">
-          <Lock className="w-4 h-4 mr-2" />
-          Change Password
+        <Button variant="outline" size="sm" data-testid="button-change-password" className="px-2 sm:px-3">
+          <Lock className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Change Password</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

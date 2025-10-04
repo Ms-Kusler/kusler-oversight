@@ -66,9 +66,9 @@ export default function EmailPreferencesDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" data-testid="button-email-preferences">
-          <Mail className="w-4 h-4 mr-2" />
-          Email Preferences
+        <Button variant="outline" size="sm" data-testid="button-email-preferences" className="px-2 sm:px-3">
+          <Mail className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Email Preferences</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[450px]">
