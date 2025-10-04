@@ -85,8 +85,15 @@ export default function Dashboard() {
           </div>
 
           <div className="grid gap-3 sm:gap-4">
-            <AIAssistant />
-            <ProjectUpdates />
+            {hasFinancialTools && <AIAssistant />}
+            {hasProjectManagement && <ProjectUpdates />}
+            {!hasFinancialTools && !hasProjectManagement && (
+              <div className="p-6 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm text-center">
+                <p className="text-muted-foreground">
+                  Connect your tools to see AI insights and project updates
+                </p>
+              </div>
+            )}
           </div>
 
           <SecurityStatus />
