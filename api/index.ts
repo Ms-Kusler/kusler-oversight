@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import express from 'express';
+import express, { type Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import { registerRoutes } from '../server/routes';
+import { serveStatic } from '../server/vite';
 import { seedAdminUser, seedDemoClient } from '../server/seed';
 
 const app = express();
@@ -21,26 +21,27 @@ app.use(session({
   }
 }));
 
-// Initialize routes
-let routesRegistered = false;
-async function ensureInitialized() {
-  if (!routesRegistered) {
-    await registerRoutes(app);
-    
-    // Seed database once
-    try {
-      await seedAdminUser();
-      await seedDemoClient();
-    } catch (err) {
-      // Users might already exist
-    }
-    
-    routesRegistered = true;
+// Initialize
+(async () => {
+  await registerRoutes(app);
+  
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+  });
+  
+  // Serve static files in production
+  serveStatic(app);
+  
+  // Seed database once
+  try {
+    await seedAdminUser();
+    await seedDemoClient();
+  } catch (err) {
+    // Users might already exist - ignore
   }
-}
+})();
 
-// Export handler for Vercel
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  await ensureInitialized();
-  return app(req as any, res as any);
-}
+// Export app for Vercel
+export default app;
