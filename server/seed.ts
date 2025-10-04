@@ -45,14 +45,14 @@ export async function seedDemoClient() {
     username: demoUsername,
     password: demoPassword,
     email: 'demo@example.com',
-    businessName: 'Acme Plumbing LLC',
+    businessName: 'Kusler Consulting',
     role: 'client'
   });
   
   console.log('✓ Demo client created');
   console.log('  Username: demo');
   console.log('  Password: demo123');
-  console.log('  Business: Acme Plumbing LLC');
+  console.log('  Business: Kusler Consulting');
   
   // Seed sample data for demo account
   await seedDemoData(demoClient.id);

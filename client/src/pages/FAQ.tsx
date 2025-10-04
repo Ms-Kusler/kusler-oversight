@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
+import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { Search, HelpCircle, MessageSquare } from "lucide-react";
 
 export default function FAQ() {
   const [searchQuery, setSearchQuery] = useState("");
+  const { user } = useAuth();
 
   //todo: remove mock functionality
   const faqs = [
@@ -70,7 +72,7 @@ export default function FAQ() {
       <div className="absolute top-0 left-1/3 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '5s' }} />
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        <DashboardHeader companyName="Kusler Consulting" />
+        <DashboardHeader companyName={user?.businessName || "Kusler Consulting"} />
         
         <main className="px-4 space-y-5 pb-6 pt-3">
           <div>

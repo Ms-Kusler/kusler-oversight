@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Integration, Automation } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DashboardHeader from "@/components/DashboardHeader";
+import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
@@ -23,6 +24,7 @@ const AVAILABLE_PLATFORMS = [
 export default function Workflows() {
   const [activePage, setActivePage] = useState("workflows");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const { data: integrations = [] } = useQuery<Integration[]>({
     queryKey: ['/api/integrations'],
@@ -85,7 +87,7 @@ export default function Workflows() {
       <div className="absolute top-0 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-chart-3/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '5s' }} />
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        <DashboardHeader companyName="Kusler Consulting" />
+        <DashboardHeader companyName={user?.businessName || "Kusler Consulting"} />
         
         <main className="px-4 space-y-5 pb-6 pt-3">
           <div>

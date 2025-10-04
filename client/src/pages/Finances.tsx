@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
+import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import DebugPanel from "@/components/DebugPanel";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { ArrowUpRight, ArrowDownRight, DollarSign, Calendar } from "lucide-react
 
 export default function Finances() {
   const [activePage, setActivePage] = useState("finances");
+  const { user } = useAuth();
 
   //todo: remove mock functionality
   const transactions = [
@@ -31,7 +33,7 @@ export default function Finances() {
       <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '4s' }} />
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        <DashboardHeader companyName="Kusler Consulting" />
+        <DashboardHeader companyName={user?.businessName || "Kusler Consulting"} />
         
         <main className="px-4 space-y-5 pb-6 pt-3">
           <div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Integration } from "@shared/schema";
 import DashboardHeader from "@/components/DashboardHeader";
+import { useAuth } from "@/lib/auth";
 import TimePeriodSelector from "@/components/TimePeriodSelector";
 import MetricCard from "@/components/MetricCard";
 import BillsCard from "@/components/BillsCard";
@@ -18,6 +19,7 @@ import DebugPanel from "@/components/DebugPanel";
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("home");
   const [period, setPeriod] = useState("This Month");
+  const { user } = useAuth();
 
   const { data: integrations = [] } = useQuery<Integration[]>({
     queryKey: ['/api/integrations'],
@@ -53,7 +55,7 @@ export default function Dashboard() {
       <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-chart-2/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        <DashboardHeader companyName="Kusler Consulting" />
+        <DashboardHeader companyName={user?.businessName || "Kusler Consulting"} />
         
         <main className="px-4 space-y-5 pb-6 pt-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
