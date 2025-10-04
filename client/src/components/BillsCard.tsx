@@ -21,7 +21,7 @@ export default function BillsCard({ invoicesDue, overdue }: BillsCardProps) {
       )}
       
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-        Bills & Payments Due
+        Invoices Due
       </h3>
       
       <div className="space-y-3 relative z-10">
