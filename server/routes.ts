@@ -120,6 +120,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/users", requireAdmin, async (req: AuthRequest, res) => {
+    try {
+      const { businessName, email, username, password } = req.body;
+      
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+      
+      const newUser = await storage.createUser({
+        businessName,
+        email,
+        username,
+        password,
+        role: 'client'
+      });
+      
+      await logAdminAction(
+        req.userId!,
+        'create_client',
+        newUser.id,
+        { username, businessName, email },
+        req.ip
+      );
+      
+      res.json({
+        id: newUser.id,
+        businessName: newUser.businessName,
+        email: newUser.email,
+        username: newUser.username
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create client account" });
+    }
+  });
+
   // Dashboard data endpoint
   app.get("/api/dashboard", async (req, res) => {
     try {

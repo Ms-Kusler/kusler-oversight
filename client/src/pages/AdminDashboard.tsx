@@ -1,8 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Activity, Users, Clock } from "lucide-react";
+import AddClientDialog from "@/components/AddClientDialog";
+import OffboardClientDialog from "@/components/OffboardClientDialog";
 
 interface ClientUser {
   id: string;
@@ -16,8 +20,23 @@ interface ClientUser {
 }
 
 export default function AdminDashboard() {
+  const { toast } = useToast();
+  
   const { data: clients = [], isLoading } = useQuery<ClientUser[]>({
     queryKey: ['/api/admin/users'],
+  });
+
+  const reactivateMutation = useMutation({
+    mutationFn: async (clientId: string) => {
+      return await apiRequest(`/api/admin/users/${clientId}/toggle-active`, 'POST');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({
+        title: "Client reactivated",
+        description: "Client account has been reactivated successfully.",
+      });
+    }
   });
 
   const activeClients = clients.filter(c => c.isActive).length;
@@ -31,10 +50,13 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
             <p className="text-muted-foreground mt-1">Kusler Consulting Operations Hub</p>
           </div>
-          <Badge variant="outline" className="gap-2" data-testid="badge-admin">
-            <Activity className="w-3 h-3" />
-            Admin Access
-          </Badge>
+          <div className="flex items-center gap-3">
+            <AddClientDialog />
+            <Badge variant="outline" className="gap-2" data-testid="badge-admin">
+              <Activity className="w-3 h-3" />
+              Admin Access
+            </Badge>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
@@ -139,9 +161,28 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <Button variant="outline" size="sm" data-testid={`button-view-${client.id}`}>
-                    View Dashboard
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {!client.isActive && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => reactivateMutation.mutate(client.id)}
+                        disabled={reactivateMutation.isPending}
+                        data-testid={`button-reactivate-${client.id}`}
+                      >
+                        Reactivate
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" data-testid={`button-view-${client.id}`}>
+                      View Dashboard
+                    </Button>
+                    {client.isActive && (
+                      <OffboardClientDialog 
+                        clientId={client.id} 
+                        businessName={client.businessName || client.username}
+                      />
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
