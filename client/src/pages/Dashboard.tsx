@@ -31,7 +31,7 @@ export default function Dashboard() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-chart-2/10 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
       
       <div className="relative z-10">
-        <DashboardHeader companyName="Kusier Consulting" />
+        <DashboardHeader companyName="Kusler Consulting" />
         
         <main className="px-4 space-y-6 pb-6">
           <div className="space-y-3">

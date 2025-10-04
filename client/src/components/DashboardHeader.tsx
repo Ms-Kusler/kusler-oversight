@@ -5,7 +5,7 @@ interface DashboardHeaderProps {
   companyName?: string;
 }
 
-export default function DashboardHeader({ companyName = "Kusier Consulting" }: DashboardHeaderProps) {
+export default function DashboardHeader({ companyName = "Kusler Consulting" }: DashboardHeaderProps) {
   return (
     <header className="flex items-center justify-between px-4 py-4 backdrop-blur-sm sticky top-0 z-40 bg-background/80">
       <div className="flex items-center gap-3">
