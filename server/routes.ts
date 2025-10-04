@@ -2,10 +2,67 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIntegrationSchema, insertAutomationSchema } from "@shared/schema";
-import { requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
+import { requireAuth, requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
+import { authenticateUser, hashPassword } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const MOCK_USER_ID = "demo-user";
+  
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password required" });
+      }
+      
+      const user = await authenticateUser(username, password);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      req.session.userId = user.id;
+      req.session.userRole = user.role;
+      
+      res.json({
+        id: user.id,
+        username: user.username,
+        businessName: user.businessName,
+        email: user.email,
+        role: user.role
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.json({ success: true });
+    });
+  });
+
+  app.get("/api/auth/me", requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({
+        id: user.id,
+        username: user.username,
+        businessName: user.businessName,
+        email: user.email,
+        role: user.role
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
 
   app.get("/api/admin/users", requireAdmin, async (req: AuthRequest, res) => {
     try {
@@ -129,11 +186,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Username already exists" });
       }
       
+      const hashedPassword = await hashPassword(password);
+      
       const newUser = await storage.createUser({
         businessName,
         email,
         username,
-        password,
+        password: hashedPassword,
         role: 'client'
       });
       
@@ -157,9 +216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard data endpoint
-  app.get("/api/dashboard", async (req, res) => {
+  app.get("/api/dashboard", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const userId = req.query.userId as string || MOCK_USER_ID;
+      const userId = req.userId!;
       const transactions = await storage.getTransactions(userId);
       const invoices = await storage.getInvoices(userId);
       
@@ -191,16 +250,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all transactions
-  app.get("/api/transactions", async (req, res) => {
-    const userId = req.query.userId as string || MOCK_USER_ID;
+  app.get("/api/transactions", requireAuth, async (req: AuthRequest, res) => {
+    const userId = req.userId!;
     const transactions = await storage.getTransactions(userId);
     res.json(transactions);
   });
 
   // Create transaction
-  app.post("/api/transactions", async (req, res) => {
+  app.post("/api/transactions", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const transaction = await storage.createTransaction(req.body);
+      const transaction = await storage.createTransaction({
+        ...req.body,
+        userId: req.userId!
+      });
       res.json(transaction);
     } catch (error) {
       res.status(400).json({ error: "Invalid transaction data" });
@@ -208,8 +270,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all invoices
-  app.get("/api/invoices", async (req, res) => {
-    const userId = req.query.userId as string || MOCK_USER_ID;
+  app.get("/api/invoices", requireAuth, async (req: AuthRequest, res) => {
+    const userId = req.userId!;
     const invoices = await storage.getInvoices(userId);
     res.json(invoices);
   });
@@ -235,16 +297,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all integrations
-  app.get("/api/integrations", async (req, res) => {
-    const userId = req.query.userId as string || MOCK_USER_ID;
+  app.get("/api/integrations", requireAuth, async (req: AuthRequest, res) => {
+    const userId = req.userId!;
     const integrations = await storage.getIntegrations(userId);
     res.json(integrations);
   });
 
   // Create integration
-  app.post("/api/integrations", async (req, res) => {
+  app.post("/api/integrations", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const data = insertIntegrationSchema.parse(req.body);
+      const data = insertIntegrationSchema.parse({
+        ...req.body,
+        userId: req.userId!
+      });
       const integration = await storage.createIntegration(data);
       res.json(integration);
     } catch (error) {
@@ -273,16 +338,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all automations
-  app.get("/api/automations", async (req, res) => {
-    const userId = req.query.userId as string || MOCK_USER_ID;
+  app.get("/api/automations", requireAuth, async (req: AuthRequest, res) => {
+    const userId = req.userId!;
     const automations = await storage.getAutomations(userId);
     res.json(automations);
   });
 
   // Create automation
-  app.post("/api/automations", async (req, res) => {
+  app.post("/api/automations", requireAuth, async (req: AuthRequest, res) => {
     try {
-      const data = insertAutomationSchema.parse(req.body);
+      const data = insertAutomationSchema.parse({
+        ...req.body,
+        userId: req.userId!
+      });
       const automation = await storage.createAutomation(data);
       res.json(automation);
     } catch (error) {
@@ -317,14 +385,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (event.type === 'payment_intent.succeeded') {
         const payment = event.data.object;
-        await storage.createTransaction({
-          userId: payment.metadata?.userId || MOCK_USER_ID,
-          type: 'payment',
-          amount: payment.amount,
-          description: `Stripe payment from ${payment.customer}`,
-          category: 'payment',
-          source: 'stripe'
-        });
+        const userId = payment.metadata?.userId;
+        
+        if (userId) {
+          await storage.createTransaction({
+            userId,
+            type: 'payment',
+            amount: payment.amount,
+            description: `Stripe payment from ${payment.customer}`,
+            category: 'payment',
+            source: 'stripe'
+          });
+        }
       }
       
       res.json({ received: true });
@@ -337,13 +409,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhooks/quickbooks", async (req, res) => {
     try {
       const event = req.body;
+      const userId = event.userId;
       
-      if (event.eventNotifications) {
+      if (event.eventNotifications && userId) {
         for (const notification of event.eventNotifications) {
           for (const entity of notification.dataChangeEvent?.entities || []) {
             if (entity.name === 'Invoice') {
               await storage.createInvoice({
-                userId: MOCK_USER_ID,
+                userId,
                 amount: entity.amount || 0,
                 dueDate: new Date(entity.dueDate),
                 status: entity.status?.toLowerCase() || 'due',
@@ -376,18 +449,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/webhooks/zapier", async (req, res) => {
     try {
       const { type, data, userId } = req.body;
-      const targetUserId = userId || MOCK_USER_ID;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required in webhook payload" });
+      }
       
       switch (type) {
         case 'transaction':
           await storage.createTransaction({
-            userId: targetUserId,
+            userId,
             ...data
           });
           break;
         case 'invoice':
           await storage.createInvoice({
-            userId: targetUserId,
+            userId,
             ...data
           });
           break;

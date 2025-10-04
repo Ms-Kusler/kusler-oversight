@@ -1,13 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import { storage } from "../storage";
 
+declare module 'express-session' {
+  interface SessionData {
+    userId?: string;
+    userRole?: string;
+  }
+}
+
 export interface AuthRequest extends Request {
   userId?: string;
   userRole?: string;
 }
 
 export async function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
-  const userId = req.headers['x-user-id'] as string;
+  const userId = req.session.userId;
   
   if (!userId) {
     return res.status(401).json({ error: "Authentication required" });
@@ -15,6 +22,7 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
 
   const user = await storage.getUser(userId);
   if (!user || !user.isActive) {
+    req.session.destroy(() => {});
     return res.status(401).json({ error: "Invalid or inactive user" });
   }
 

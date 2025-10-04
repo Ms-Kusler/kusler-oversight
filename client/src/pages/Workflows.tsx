@@ -34,9 +34,7 @@ export default function Workflows() {
 
   const connectMutation = useMutation({
     mutationFn: async (platform: string) => {
-      const MOCK_USER_ID = "demo-user";
       return await apiRequest('/api/integrations', 'POST', {
-        userId: MOCK_USER_ID,
         platform,
         isConnected: true
       });
