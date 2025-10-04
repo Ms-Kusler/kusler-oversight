@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { Integration } from "@shared/schema";
 import DashboardHeader from "@/components/DashboardHeader";
 import TimePeriodSelector from "@/components/TimePeriodSelector";
 import MetricCard from "@/components/MetricCard";
@@ -17,7 +19,14 @@ export default function Dashboard() {
   const [activePage, setActivePage] = useState("home");
   const [period, setPeriod] = useState("This Month");
 
-  //todo: remove mock functionality
+  const { data: integrations = [] } = useQuery<Integration[]>({
+    queryKey: ['/api/integrations'],
+  });
+
+  const { data: dashboardData } = useQuery({
+    queryKey: ['/api/dashboard'],
+  });
+
   const profitData = [
     { value: 3200 },
     { value: 3800 },
@@ -27,6 +36,14 @@ export default function Dashboard() {
     { value: 4300 },
     { value: 5100 }
   ];
+
+  const connectedIntegrations = integrations.filter(i => i.isConnected);
+  const hasFinancialTools = connectedIntegrations.some(i => 
+    ['stripe', 'paypal', 'quickbooks', 'xero'].includes(i.platform.toLowerCase())
+  );
+  const hasProjectManagement = connectedIntegrations.some(i => 
+    ['asana', 'monday', 'trello', 'clickup'].includes(i.platform.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">

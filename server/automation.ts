@@ -40,9 +40,9 @@ class AutomationSystem {
   }
 
   stopAll() {
-    for (const timer of this.timers.values()) {
+    Array.from(this.timers.values()).forEach(timer => {
       clearInterval(timer);
-    }
+    });
     this.timers.clear();
   }
 }
