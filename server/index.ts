@@ -4,9 +4,19 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { registerRoutes } from "./routes";
-import { setupVite, log } from "./vite";
 import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
+
+// Simple log function for production (vite.ts is only imported in development)
+function simpleLog(msg: string) {
+  const time = new Date().toLocaleTimeString("en-US", { 
+    hour: "numeric", 
+    minute: "2-digit", 
+    second: "2-digit", 
+    hour12: true 
+  });
+  console.log(`${time} [express] ${msg}`);
+}
 
 const app = express();
 app.use(express.json());
@@ -46,7 +56,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      simpleLog(logLine);
     }
   });
 
@@ -68,7 +78,10 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    const { setupVite, log } = await import("./vite");
     await setupVite(app, server);
+    // Use vite's log function in development
+    (globalThis as any).__viteLog = log;
   } else {
     // Production: serve static files with import.meta.dirname fallback for Railway/bundled environments
     const serverDir = typeof import.meta.dirname === "string" 
@@ -101,7 +114,8 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, async () => {
-    log(`serving on port ${port}`);
+    const logFn = (globalThis as any).__viteLog || simpleLog;
+    logFn(`serving on port ${port}`);
     await seedAdminUser();
     await seedDemoClient();
     startAutomations();

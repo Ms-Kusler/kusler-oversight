@@ -1,0 +1,188 @@
+2025-10-05T15:51:40.000000000Z [inf]  Starting Container
+2025-10-05T15:51:40.867520932Z [err]  node:internal/errors:496
+2025-10-05T15:51:40.867524904Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:40.867530156Z [err]      ^
+2025-10-05T15:51:40.867536367Z [err]  
+2025-10-05T15:51:40.867542630Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:40.867548527Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:40.867553755Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:40.867558540Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:40.867563849Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:40.867569339Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:40.867573883Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:40.867581440Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:40.867587811Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:40.867593937Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:40.867598864Z [err]  }
+2025-10-05T15:51:40.867603002Z [err]  
+2025-10-05T15:51:40.867606728Z [err]  Node.js v18.20.5
+2025-10-05T15:51:42.485678961Z [err]  node:internal/errors:496
+2025-10-05T15:51:42.485713581Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:42.485723030Z [err]      ^
+2025-10-05T15:51:42.485727506Z [err]  
+2025-10-05T15:51:42.485731529Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:42.485735452Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:42.485739516Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:42.485743759Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:42.485747705Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:42.485752213Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:42.485756050Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:42.485759859Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:42.485763897Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:42.485769433Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:42.485773313Z [err]  }
+2025-10-05T15:51:42.485777015Z [err]  
+2025-10-05T15:51:42.485780495Z [err]  Node.js v18.20.5
+2025-10-05T15:51:43.808882425Z [err]  node:internal/errors:496
+2025-10-05T15:51:43.808890571Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:43.808896400Z [err]      ^
+2025-10-05T15:51:43.808902210Z [err]  
+2025-10-05T15:51:43.808906950Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:43.808915063Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:43.808921205Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:43.808927167Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:43.808932672Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:43.808938316Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:43.808943957Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:43.808949786Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:43.808975831Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:43.808982347Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:43.808987923Z [err]  }
+2025-10-05T15:51:43.808993822Z [err]  
+2025-10-05T15:51:43.808999559Z [err]  Node.js v18.20.5
+2025-10-05T15:51:45.573719588Z [err]  node:internal/errors:496
+2025-10-05T15:51:45.573727525Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:45.573734897Z [err]      ^
+2025-10-05T15:51:45.573739583Z [err]  
+2025-10-05T15:51:45.573744667Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:45.573748961Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:45.573753408Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:45.573757235Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:45.573761215Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:45.573765151Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:45.573769737Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:45.573773741Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:45.573779450Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:45.573783611Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:45.573788121Z [err]  }
+2025-10-05T15:51:45.573792096Z [err]  
+2025-10-05T15:51:45.573796493Z [err]  Node.js v18.20.5
+2025-10-05T15:51:47.660083132Z [err]  node:internal/errors:496
+2025-10-05T15:51:47.660104254Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:47.660110177Z [err]      ^
+2025-10-05T15:51:47.660117752Z [err]  
+2025-10-05T15:51:47.660123195Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:47.660129572Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:47.660134996Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:47.660139864Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:47.660144923Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:47.660149949Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:47.660155203Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:47.660159832Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:47.660165310Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:47.660170452Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:47.660175021Z [err]  }
+2025-10-05T15:51:47.660180185Z [err]  
+2025-10-05T15:51:47.660184988Z [err]  Node.js v18.20.5
+2025-10-05T15:51:49.607517986Z [err]  node:internal/errors:496
+2025-10-05T15:51:49.607524883Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:49.607529122Z [err]      ^
+2025-10-05T15:51:49.607533870Z [err]  
+2025-10-05T15:51:49.607538029Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:49.607541991Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:49.607553497Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:49.607560495Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:49.607565232Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:49.607570744Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:49.607575703Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:49.607579383Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:49.607583188Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:49.607587285Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:49.607591146Z [err]  }
+2025-10-05T15:51:49.607595127Z [err]  
+2025-10-05T15:51:49.607600196Z [err]  Node.js v18.20.5
+2025-10-05T15:51:51.548097083Z [err]  node:internal/errors:496
+2025-10-05T15:51:51.548101304Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:51.548106616Z [err]      ^
+2025-10-05T15:51:51.548110793Z [err]  
+2025-10-05T15:51:51.548114541Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:51.548118285Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:51.548122061Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:51.548126310Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:51.548130447Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:51.548135764Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:51.548140094Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:51.548144725Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:51.548148843Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:51.548153199Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:51.548156799Z [err]  }
+2025-10-05T15:51:51.548160519Z [err]  
+2025-10-05T15:51:51.548164418Z [err]  Node.js v18.20.5
+2025-10-05T15:51:53.828215180Z [err]  node:internal/errors:496
+2025-10-05T15:51:53.828224328Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:53.828229984Z [err]      ^
+2025-10-05T15:51:53.828235367Z [err]  
+2025-10-05T15:51:53.828241503Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:53.828247235Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:53.828253282Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:53.828258437Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:53.828264023Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:53.828269445Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:53.828276283Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:53.828282772Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:53.828287891Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:53.828293287Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:53.828298739Z [err]  }
+2025-10-05T15:51:53.828305779Z [err]  
+2025-10-05T15:51:53.828312368Z [err]  Node.js v18.20.5
+2025-10-05T15:51:55.803415331Z [err]  node:internal/errors:496
+2025-10-05T15:51:55.803421477Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:55.803425768Z [err]      ^
+2025-10-05T15:51:55.803433072Z [err]  
+2025-10-05T15:51:55.803436969Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:55.803440854Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:55.803444840Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:55.803449814Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:55.803453875Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:55.803459754Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:55.803463688Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:55.803467489Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:55.803471457Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:55.803475192Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:55.803480995Z [err]  }
+2025-10-05T15:51:55.803485174Z [err]  
+2025-10-05T15:51:55.803489119Z [err]  Node.js v18.20.5
+2025-10-05T15:51:57.627708686Z [err]  node:internal/errors:496
+2025-10-05T15:51:57.627713768Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:57.627718405Z [err]      ^
+2025-10-05T15:51:57.627724188Z [err]  
+2025-10-05T15:51:57.627732226Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:57.627742674Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:57.627808508Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:57.627813907Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:57.627820382Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:57.627826668Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:57.627833387Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:57.627841268Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:57.627849264Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:57.627857123Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:57.627864426Z [err]  }
+2025-10-05T15:51:57.627898562Z [err]  
+2025-10-05T15:51:57.627905807Z [err]  Node.js v18.20.5
+2025-10-05T15:51:59.809755731Z [err]  node:internal/errors:496
+2025-10-05T15:51:59.809763974Z [err]      ErrorCaptureStackTrace(err);
+2025-10-05T15:51:59.809769603Z [err]      ^
+2025-10-05T15:51:59.809774759Z [err]  
+2025-10-05T15:51:59.809780857Z [err]  TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+2025-10-05T15:51:59.809786867Z [err]      at new NodeError (node:internal/errors:405:5)
+2025-10-05T15:51:59.809797106Z [err]      at validateString (node:internal/validators:162:11)
+2025-10-05T15:51:59.809802596Z [err]      at Object.resolve (node:path:1097:7)
+2025-10-05T15:51:59.809809495Z [err]      at file:///app/dist/index.js:1003:17
+2025-10-05T15:51:59.809815259Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+2025-10-05T15:51:59.809820617Z [err]      at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+2025-10-05T15:51:59.809839364Z [err]      at async loadESM (node:internal/process/esm_loader:34:7)
+2025-10-05T15:51:59.809845077Z [err]      at async handleMainPromise (node:internal/modules/run_main:106:12) {
+2025-10-05T15:51:59.809851937Z [err]    code: 'ERR_INVALID_ARG_TYPE'
+2025-10-05T15:51:59.809857355Z [err]  }
+2025-10-05T15:51:59.809862651Z [err]  
+2025-10-05T15:51:59.809868142Z [err]  Node.js v18.20.5
