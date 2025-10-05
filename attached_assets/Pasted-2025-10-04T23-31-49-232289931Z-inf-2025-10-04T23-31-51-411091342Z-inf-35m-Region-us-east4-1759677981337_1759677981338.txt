@@ -1,0 +1,290 @@
+2025-10-04T23:31:49.232289931Z [inf]  
+2025-10-04T23:31:51.411091342Z [inf]  [35m[Region: us-east4][0m
+2025-10-04T23:31:51.415369866Z [inf]  [35m==============
+2025-10-04T23:31:51.415390267Z [inf]  Using Nixpacks
+2025-10-04T23:31:51.415394003Z [inf]  ==============
+2025-10-04T23:31:51.415397728Z [inf]  [0m
+2025-10-04T23:31:51.415484164Z [inf]  context: 5zj4-K2jB
+2025-10-04T23:31:51.500507604Z [inf]  ╔══════════════════════════════ Nixpacks v1.38.0 ══════════════════════════════╗
+2025-10-04T23:31:51.500544925Z [inf]  ║ setup      │ nodejs_18, npm-9_x, openssl                                     ║
+2025-10-04T23:31:51.500550835Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-04T23:31:51.500555117Z [inf]  ║ caddy      │ pkgs: caddy                                                     ║
+2025-10-04T23:31:51.500561350Z [inf]  ║            │ cmds: caddy fmt --overwrite /assets/Caddyfile                   ║
+2025-10-04T23:31:51.500565465Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-04T23:31:51.500569391Z [inf]  ║ install    │ npm ci                                                          ║
+2025-10-04T23:31:51.500573831Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-04T23:31:51.500579170Z [inf]  ║ build      │ npm install && chmod +x fix-import-meta.sh && ./fix-import-     ║
+2025-10-04T23:31:51.500583058Z [inf]  ║            │ meta.sh && npx vite build && esbuild server/index.ts            ║
+2025-10-04T23:31:51.500587503Z [inf]  ║            │ --platform=node --packages=external --bundle --format=esm       ║
+2025-10-04T23:31:51.500591165Z [inf]  ║            │ --outdir=dist && mv server/index.ts.backup server/index.ts      ║
+2025-10-04T23:31:51.500594448Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-04T23:31:51.500597891Z [inf]  ║ start      │ NODE_ENV=production node dist/index.js                          ║
+2025-10-04T23:31:51.500607270Z [inf]  ╚══════════════════════════════════════════════════════════════════════════════╝
+2025-10-04T23:31:51.898002988Z [inf]  [internal] load build definition from Dockerfile
+2025-10-04T23:31:51.898060470Z [inf]  [internal] load build definition from Dockerfile
+2025-10-04T23:31:51.898085210Z [inf]  [internal] load build definition from Dockerfile
+2025-10-04T23:31:51.898098891Z [inf]  [internal] load build definition from Dockerfile
+2025-10-04T23:31:51.909013275Z [inf]  [internal] load build definition from Dockerfile
+2025-10-04T23:31:51.911324018Z [inf]  [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2025-10-04T23:31:52.056523517Z [inf]  [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2025-10-04T23:31:52.056658024Z [inf]  [internal] load .dockerignore
+2025-10-04T23:31:52.056724865Z [inf]  [internal] load .dockerignore
+2025-10-04T23:31:52.056996287Z [inf]  [internal] load .dockerignore
+2025-10-04T23:31:52.067371240Z [inf]  [internal] load .dockerignore
+2025-10-04T23:31:52.073327865Z [inf]  [stage-0 11/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-/root/npm,target=/root/.npm npm ci
+2025-10-04T23:31:52.073366895Z [inf]  [stage-0 10/15] COPY . /app/.
+2025-10-04T23:31:52.073374017Z [inf]  [stage-0  9/15] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-04T23:31:52.073380208Z [inf]  [stage-0  1/15] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2025-10-04T23:31:52.073391423Z [inf]  [stage-0  3/15] COPY .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix
+2025-10-04T23:31:52.073402317Z [inf]  [stage-0 13/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-node_modules/cache,target=/app/node_modules/.cache npm install && chmod +x fix-import-meta.sh && ./fix-import-meta.sh && npx vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && mv server/index.ts.backup server/index.ts
+2025-10-04T23:31:52.073409435Z [inf]  [stage-0 15/15] COPY . /app
+2025-10-04T23:31:52.073417347Z [inf]  [stage-0  4/15] RUN nix-env -if .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix && nix-collect-garbage -d
+2025-10-04T23:31:52.073422924Z [inf]  [stage-0  7/15] COPY .nixpacks/assets /assets/
+2025-10-04T23:31:52.073427952Z [inf]  [internal] load build context
+2025-10-04T23:31:52.073435748Z [inf]  [stage-0  2/15] WORKDIR /app/
+2025-10-04T23:31:52.073443197Z [inf]  [stage-0 12/15] COPY . /app/.
+2025-10-04T23:31:52.073449184Z [inf]  [stage-0 14/15] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-04T23:31:52.073460188Z [inf]  [stage-0  6/15] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2025-10-04T23:31:52.073466343Z [inf]  [stage-0  5/15] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2025-10-04T23:31:52.073479507Z [inf]  [stage-0  8/15] COPY . /app/.
+2025-10-04T23:31:52.073495224Z [inf]  [stage-0  1/15] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2025-10-04T23:31:52.073501682Z [inf]  [internal] load build context
+2025-10-04T23:31:52.073910153Z [inf]  [internal] load build context
+2025-10-04T23:31:52.294669657Z [inf]  [internal] load build context
+2025-10-04T23:31:52.297961644Z [inf]  [stage-0  2/15] WORKDIR /app/
+2025-10-04T23:31:52.297992712Z [inf]  [stage-0  3/15] COPY .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix
+2025-10-04T23:31:52.298003624Z [inf]  [stage-0  4/15] RUN nix-env -if .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix && nix-collect-garbage -d
+2025-10-04T23:31:52.298010747Z [inf]  [stage-0  5/15] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2025-10-04T23:31:52.298017819Z [inf]  [stage-0  6/15] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2025-10-04T23:31:52.298027568Z [inf]  [stage-0  7/15] COPY .nixpacks/assets /assets/
+2025-10-04T23:31:52.298040845Z [inf]  [stage-0  8/15] COPY . /app/.
+2025-10-04T23:31:52.368712725Z [inf]  [stage-0  8/15] COPY . /app/.
+2025-10-04T23:31:52.370531447Z [inf]  [stage-0  9/15] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-04T23:31:52.525011018Z [inf]  [stage-0  9/15] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-04T23:31:52.526688741Z [inf]  [stage-0 10/15] COPY . /app/.
+2025-10-04T23:31:52.591837509Z [inf]  [stage-0 10/15] COPY . /app/.
+2025-10-04T23:31:52.593349886Z [inf]  [stage-0 11/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-/root/npm,target=/root/.npm npm ci
+2025-10-04T23:31:52.781657365Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-04T23:31:53.333932283Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/auth-token@6.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.33416348Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/core@7.0.5',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.334630736Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/endpoint@11.0.1',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.334976811Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/graphql@9.0.2',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.335313354Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-paginate-rest@13.2.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.335661059Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-request-log@6.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.335871895Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-rest-endpoint-methods@16.1.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.336358616Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/request@10.0.5',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.336611586Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/request-error@7.0.1',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:53.336750825Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/rest@22.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:55.692327249Z [inf]  npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+
+2025-10-04T23:31:55.787248293Z [inf]  npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+
+2025-10-04T23:31:58.276265324Z [inf]  
+added 496 packages, and audited 497 packages in 6s
+
+65 packages are looking for funding
+
+2025-10-04T23:31:58.276282265Z [inf]    run `npm fund` for details
+
+2025-10-04T23:31:58.299284967Z [inf]  
+8 vulnerabilities (3 low, 5 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+2025-10-04T23:31:58.551962350Z [inf]  [stage-0 11/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-/root/npm,target=/root/.npm npm ci
+2025-10-04T23:31:58.553848775Z [inf]  [stage-0 12/15] COPY . /app/.
+2025-10-04T23:31:58.715239774Z [inf]  [stage-0 12/15] COPY . /app/.
+2025-10-04T23:31:58.721169040Z [inf]  [stage-0 13/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-node_modules/cache,target=/app/node_modules/.cache npm install && chmod +x fix-import-meta.sh && ./fix-import-meta.sh && npx vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && mv server/index.ts.backup server/index.ts
+2025-10-04T23:31:58.892985547Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-04T23:31:59.35771207Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/auth-token@6.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.357896302Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/core@7.0.5',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.358400616Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/endpoint@11.0.1',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.358651909Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/graphql@9.0.2',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.358918198Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-paginate-rest@13.2.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.359177132Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-request-log@6.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.359282146Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/plugin-rest-endpoint-methods@16.1.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.359613004Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/request@10.0.5',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.359859767Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/request-error@7.0.1',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:31:59.359969075Z [inf]  npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@octokit/rest@22.0.0',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.5', npm: '10.8.2' }
+npm warn EBADENGINE }
+
+2025-10-04T23:32:00.729999498Z [inf]  
+up to date, audited 497 packages in 2s
+
+2025-10-04T23:32:00.730021637Z [inf]  
+
+2025-10-04T23:32:00.730112153Z [inf]  65 packages are looking for funding
+  run `npm fund` for details
+
+2025-10-04T23:32:00.754327033Z [inf]  
+8 vulnerabilities (3 low, 5 moderate)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+2025-10-04T23:32:00.78528075Z [inf]  ✅ Patched server/vite.ts to use fileURLToPath
+
+2025-10-04T23:32:00.884916615Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-04T23:32:01.320030716Z [inf]  [36mvite v5.4.20 [32mbuilding for production...[36m[39m
+
+2025-10-04T23:32:01.373940572Z [inf]  transforming...
+
+2025-10-04T23:32:01.602332133Z [inf]  Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+2025-10-04T23:32:02.359421103Z [inf]  
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+
+2025-10-04T23:32:06.657076398Z [inf]  [32m✓[39m 2543 modules transformed.
+
+2025-10-04T23:32:07.102395054Z [inf]  rendering chunks...
+
+2025-10-04T23:32:07.115078739Z [inf]  computing gzip size...
+
+2025-10-04T23:32:07.146446437Z [inf]  [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  0.89 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+
+2025-10-04T23:32:07.146456179Z [inf]  [2m../dist/public/[22m[2massets/[22m[35mindex-yV5_YQQj.css  [39m[1m[2m 80.45 kB[22m[1m[22m[2m │ gzip:  12.94 kB[22m
+
+2025-10-04T23:32:07.146529063Z [inf]  [2m../dist/public/[22m[2massets/[22m[36mindex-qktOAvjM.js   [39m[1m[33m843.62 kB[39m[22m[2m │ gzip: 238.39 kB[22m
+
+2025-10-04T23:32:07.146655245Z [inf]  [33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+
+2025-10-04T23:32:07.147015608Z [inf]  [32m✓ built in 5.80s[39m
+
+2025-10-04T23:32:07.201909007Z [inf]  
+  dist/index.js  56.3kb
+
+⚡ Done in 5ms
+
+2025-10-04T23:32:07.230653465Z [inf]  [stage-0 13/15] RUN --mount=type=cache,id=s/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2-node_modules/cache,target=/app/node_modules/.cache npm install && chmod +x fix-import-meta.sh && ./fix-import-meta.sh && npx vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && mv server/index.ts.backup server/index.ts
+2025-10-04T23:32:07.231883274Z [inf]  [stage-0 14/15] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-04T23:32:07.418158887Z [inf]  [stage-0 14/15] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-04T23:32:07.419645751Z [inf]  [stage-0 15/15] COPY . /app
+2025-10-04T23:32:07.527552721Z [inf]  [stage-0 15/15] COPY . /app
+2025-10-04T23:32:07.529977384Z [inf]  exporting to docker image format
+2025-10-04T23:32:07.529995330Z [inf]  exporting to image
+2025-10-04T23:32:10.970375912Z [inf]  [auth] sharing credentials for production-us-east4-eqdc4a.railway-registry.com
+2025-10-04T23:32:10.970435999Z [inf]  [auth] sharing credentials for production-us-east4-eqdc4a.railway-registry.com
+2025-10-04T23:32:12.913594385Z [inf]  importing to docker
+2025-10-04T23:32:26.735489056Z [inf]  importing to docker
+2025-10-04T23:32:26.774119707Z [inf]  === Successfully Built! ===
+2025-10-04T23:32:26.774160831Z [inf]  Run:
+2025-10-04T23:32:26.774165932Z [inf]  docker run -it production-us-east4-eqdc4a.railway-registry.com/42a1e7fa-9a60-43c6-87ae-edce62bdd4f2:fd67cb1f-b2b1-4531-a247-b2e4e1bf2d28
+2025-10-04T23:32:26.840845534Z [inf]  [92mBuild time: 35.43 seconds[0m
