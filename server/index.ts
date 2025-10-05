@@ -1,11 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { registerRoutes } from "./routes";
 import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
+
+const { Pool } = pg;
+const pgSession = connectPgSimple(session);
 
 // Simple log function for production (vite.ts is only imported in development)
 function simpleLog(msg: string) {
@@ -22,15 +27,33 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Create PostgreSQL connection pool for session storage
+const sessionPool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false
+  } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
+});
+
 app.use(session({
+  store: new pgSession({
+    pool: sessionPool,
+    tableName: 'session',
+    createTableIfMissing: true,
+    pruneSessionInterval: 60 * 15, // Prune expired sessions every 15 minutes
+  }),
   secret: process.env.SESSION_SECRET || 'operations-hub-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  }
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+  },
+  name: 'sessionId'
 }));
 
 app.use((req, res, next) => {
@@ -119,5 +142,17 @@ app.use((req, res, next) => {
     await seedAdminUser();
     await seedDemoClient();
     startAutomations();
+  });
+
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    const logFn = (globalThis as any).__viteLog || simpleLog;
+    logFn('SIGTERM signal received: closing HTTP server and database connections');
+    server.close(() => {
+      logFn('HTTP server closed');
+    });
+    await sessionPool.end();
+    logFn('Database pool closed');
+    process.exit(0);
   });
 })();
