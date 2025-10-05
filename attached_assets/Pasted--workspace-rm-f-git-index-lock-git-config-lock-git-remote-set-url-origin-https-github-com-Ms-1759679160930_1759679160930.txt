@@ -1,0 +1,64 @@
+~/workspace$ rm -f .git/index.lock .git/config.lock
+git remote set-url origin https://github.com/Ms-Kusler/kusler-oversight.git 2>/dev/null || git remote add origin https://github.com/Ms-Kusler/kusler-oversight.git
+git add server/index.ts railway.json
+git commit -m "Fix Railway deployment: embed import.meta.dirname fallback in server/index.ts"
+git push origin main
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+    modified:   .replit
+
+no changes added to commit (use "git add" and/or "git commit -a")
+To https://github.com/Ms-Kusler/kusler-oversight.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/Ms-Kusler/kusler-oversight.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+~/workspace$ ^C
+~/workspace$ ^[[200~git pull origin main --rebase
+git pull origin main --rebasebash: git: command not found
+~/workspace$ git push origin main~
+fatal: invalid refspec 'main~'
+~/workspace$ /nix/store/jqqdy49y3plyk7ccsn08xr88ld3wljdr-replit-runtime-path/bin/git pull origin main --rebase
+/nix/store/jqqdy49y3plyk7ccsn08xr88ld3wljdr-replit-runtime-path/bin/git push origin main
+remote: Enumerating objects: 294, done.
+remote: Counting objects: 100% (294/294), done.
+remote: Compressing objects: 100% (281/281), done.
+remote: Total 294 (delta 63), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (294/294), 14.99 MiB | 4.00 MiB/s, done.
+Resolving deltas: 100% (63/63), done.
+From https://github.com/Ms-Kusler/kusler-oversight
+ * branch            main       -> FETCH_HEAD
+ * [new branch]      main       -> origin/main
+warning: skipped previously applied commit db50d41
+warning: skipped previously applied commit e90af31
+warning: skipped previously applied commit 5ba248f
+hint: use --reapply-cherry-picks to include skipped commits
+hint: Disable this message with "git config set advice.skippedCherryPicks false"
+Auto-merging attached_assets/Operations_Hub_Official_Product_Plan_1759602735843.pdf
+CONFLICT (add/add): Merge conflict in attached_assets/Operations_Hub_Official_Product_Plan_1759602735843.pdf
+warning: Cannot merge binary files: attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602659460.png (HEAD vs. d16aebf (Initial commit))
+Auto-merging attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602659460.png
+CONFLICT (add/add): Merge conflict in attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602659460.png
+warning: Cannot merge binary files: attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602668595.png (HEAD vs. d16aebf (Initial commit))
+Auto-merging attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602668595.png
+CONFLICT (add/add): Merge conflict in attached_assets/file_000000001fc06230a74c70e99f30ed57 (1)_1759602668595.png
+error: could not apply d16aebf... Initial commit
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit: run "git rebase --skip".
+hint: To abort and get back to the state before "git rebase", run "git rebase --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+Could not apply d16aebf... Initial commit
+To https://github.com/Ms-Kusler/kusler-oversight.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/Ms-Kusler/kusler-oversight.git'
+hint: Updates were rejected because a pushed branch tip is behind its remote
+hint: counterpart. If you want to integrate the remote changes, use 'git pull'
+hint: before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+~/workspace$ 
