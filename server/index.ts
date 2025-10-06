@@ -1,4 +1,3 @@
-// server/index.ts
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -11,8 +10,9 @@ import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
 
 const { Pool } = pg;
-const PgSession = connectPgSimple(session);
+const pgSession = connectPgSimple(session);
 
+// --- Simple Log Function ---
 function simpleLog(msg: string) {
   const time = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -27,74 +27,77 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// 🚨 CRITICAL for Railway/HTTPS proxies so secure cookies are accepted
+// ✅ TRUST PROXY (important for Railway HTTPS)
 app.set("trust proxy", 1);
 
-// Postgres pool for sessions
+// --- Database Session Store ---
 const sessionPool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
+  ssl: process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : false,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
-// Sessions
+// --- SESSION CONFIGURATION ---
 app.use(
   session({
-    store: new PgSession({
+    store: new pgSession({
       pool: sessionPool,
       tableName: "session",
       createTableIfMissing: true,
-      pruneSessionInterval: 60 * 15,
+      pruneSessionInterval: 60 * 15, // every 15 mins
     }),
     secret:
       process.env.SESSION_SECRET ||
       "operations-hub-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
-    name: "sessionId",
+    proxy: true, // ✅ Required for Secure cookies on Railway
     cookie: {
-      secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
+      secure: process.env.NODE_ENV === "production", // true in production
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     },
+    name: "sessionId",
   })
 );
 
-// Minimal API logger
+// --- LOGGING MIDDLEWARE ---
 app.use((req, res, next) => {
   const start = Date.now();
-  const p = req.path;
-  let captured: Record<string, any> | undefined;
+  const pathName = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-  const origJson = res.json.bind(res);
-  (res as any).json = (body: any, ...args: any[]) => {
-    captured = body;
-    return origJson(body, ...args);
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
   res.on("finish", () => {
-    if (p.startsWith("/api")) {
-      const ms = Date.now() - start;
-      let line = `${req.method} ${p} ${res.statusCode} in ${ms}ms`;
-      if (captured) line += ` :: ${JSON.stringify(captured)}`;
-      if (line.length > 80) line = line.slice(0, 79) + "…";
-      simpleLog(line);
+    const duration = Date.now() - start;
+    if (pathName.startsWith("/api")) {
+      let logLine = `${req.method} ${pathName} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) logLine = logLine.slice(0, 79) + "…";
+      simpleLog(logLine);
     }
   });
 
   next();
 });
 
+// --- MAIN SERVER SETUP ---
 (async () => {
   const server = await registerRoutes(app);
 
-  // Error handler
+  // --- ERROR HANDLER ---
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -102,21 +105,22 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Dev vs Prod static serving
+  // --- DEVELOPMENT vs PRODUCTION SERVE LOGIC ---
   if (app.get("env") === "development") {
     const { setupVite, log } = await import("./vite");
     await setupVite(app, server);
     (globalThis as any).__viteLog = log;
   } else {
+    // Serve built frontend (dist/public)
     const serverDir =
       typeof import.meta.dirname === "string"
-        ? (import.meta as any).dirname
+        ? import.meta.dirname
         : path.dirname(fileURLToPath(import.meta.url));
     const distPath = path.resolve(serverDir, "public");
 
     if (!fs.existsSync(distPath)) {
       throw new Error(
-        `Could not find the build directory: ${distPath}, build the client first.`
+        `Could not find the build directory: ${distPath}. Make sure to build the client first.`
       );
     }
 
@@ -126,7 +130,7 @@ app.use((req, res, next) => {
     });
   }
 
-  // Start
+  // --- START SERVER ---
   const port = parseInt(process.env.PORT || "5000", 10);
   server.listen(
     {
@@ -136,17 +140,17 @@ app.use((req, res, next) => {
     },
     async () => {
       const logFn = (globalThis as any).__viteLog || simpleLog;
-      logFn(`serving on port ${port}`);
+      logFn(`✅ Server running on port ${port}`);
       await seedAdminUser();
       await seedDemoClient();
       startAutomations();
     }
   );
 
-  // Graceful shutdown
+  // --- GRACEFUL SHUTDOWN ---
   process.on("SIGTERM", async () => {
     const logFn = (globalThis as any).__viteLog || simpleLog;
-    logFn("SIGTERM: closing HTTP server and DB pool");
+    logFn("SIGTERM received: closing server and database...");
     server.close(() => logFn("HTTP server closed"));
     await sessionPool.end();
     logFn("Database pool closed");
