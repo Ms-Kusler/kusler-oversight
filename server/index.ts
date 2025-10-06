@@ -1,3 +1,4 @@
+// server/index.ts
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -10,82 +11,80 @@ import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
 
 const { Pool } = pg;
-const pgSession = connectPgSimple(session);
+const PgSession = connectPgSimple(session);
 
-// Simple log function for production (vite.ts is only imported in development)
 function simpleLog(msg: string) {
   const time = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit",
-    hour12: true
+    hour12: true,
   });
   console.log(`${time} [express] ${msg}`);
 }
 
 const app = express();
-
-// ✅ Required behind Railway/other proxies so secure cookies work
-app.set("trust proxy", 1);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Create PostgreSQL connection pool for session storage
+// 🚨 CRITICAL for Railway/HTTPS proxies so secure cookies are accepted
+app.set("trust proxy", 1);
+
+// Postgres pool for sessions
 const sessionPool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
   max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
+  connectionTimeoutMillis: 2000,
 });
 
+// Sessions
 app.use(
   session({
-    store: new pgSession({
+    store: new PgSession({
       pool: sessionPool,
       tableName: "session",
       createTableIfMissing: true,
-      pruneSessionInterval: 60 * 15 // Prune expired sessions every 15 minutes
+      pruneSessionInterval: 60 * 15,
     }),
     secret:
       process.env.SESSION_SECRET ||
       "operations-hub-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
+    name: "sessionId",
     cookie: {
-      secure: process.env.NODE_ENV === "production", // requires trust proxy
+      secure: process.env.NODE_ENV === "production", // only over HTTPS in prod
       httpOnly: true,
-      sameSite: "lax", // if API & frontend are on different domains, switch to 'none' and keep secure: true
-      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     },
-    name: "sessionId"
   })
 );
 
-// API request logger (compact)
+// Minimal API logger
 app.use((req, res, next) => {
   const start = Date.now();
-  const reqPath = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  const p = req.path;
+  let captured: Record<string, any> | undefined;
 
-  const originalResJson = res.json.bind(res);
-  (res as any).json = function (bodyJson: any, ...args: any[]) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson(bodyJson, ...args);
+  const origJson = res.json.bind(res);
+  (res as any).json = (body: any, ...args: any[]) => {
+    captured = body;
+    return origJson(body, ...args);
   };
 
   res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (reqPath.startsWith("/api")) {
-      let logLine = `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        try {
-          logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-        } catch {}
-      }
-      if (logLine.length > 80) logLine = logLine.slice(0, 79) + "…";
-      simpleLog(logLine);
+    if (p.startsWith("/api")) {
+      const ms = Date.now() - start;
+      let line = `${req.method} ${p} ${res.statusCode} in ${ms}ms`;
+      if (captured) line += ` :: ${JSON.stringify(captured)}`;
+      if (line.length > 80) line = line.slice(0, 79) + "…";
+      simpleLog(line);
     }
   });
 
@@ -95,6 +94,7 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -102,40 +102,37 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Dev uses Vite middleware; prod serves built static files
+  // Dev vs Prod static serving
   if (app.get("env") === "development") {
     const { setupVite, log } = await import("./vite");
     await setupVite(app, server);
     (globalThis as any).__viteLog = log;
   } else {
-    // Production: serve static files with import.meta.dirname fallback
     const serverDir =
       typeof import.meta.dirname === "string"
         ? (import.meta as any).dirname
         : path.dirname(fileURLToPath(import.meta.url));
-
     const distPath = path.resolve(serverDir, "public");
+
     if (!fs.existsSync(distPath)) {
       throw new Error(
-        `Could not find the build directory: ${distPath}, make sure to build the client first`
+        `Could not find the build directory: ${distPath}, build the client first.`
       );
     }
 
     app.use(express.static(distPath));
-
-    // SPA fallback
     app.use("*", (_req, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));
     });
   }
 
-  // ALWAYS serve the app on the port specified in env PORT (default 5000)
+  // Start
   const port = parseInt(process.env.PORT || "5000", 10);
   server.listen(
     {
       port,
       host: "0.0.0.0",
-      reusePort: true
+      reusePort: true,
     },
     async () => {
       const logFn = (globalThis as any).__viteLog || simpleLog;
@@ -149,13 +146,10 @@ app.use((req, res, next) => {
   // Graceful shutdown
   process.on("SIGTERM", async () => {
     const logFn = (globalThis as any).__viteLog || simpleLog;
-    logFn("SIGTERM signal received: closing HTTP server and database connections");
-    server.close(() => {
-      logFn("HTTP server closed");
-    });
+    logFn("SIGTERM: closing HTTP server and DB pool");
+    server.close(() => logFn("HTTP server closed"));
     await sessionPool.end();
     logFn("Database pool closed");
     process.exit(0);
   });
 })();
-
