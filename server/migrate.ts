@@ -120,11 +120,13 @@ export async function ensureDatabaseSchema() {
         CREATE TABLE IF NOT EXISTS tasks (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          title VARCHAR(255) NOT NULL,
+          title TEXT NOT NULL,
           description TEXT,
-          priority VARCHAR(20) NOT NULL DEFAULT 'medium',
-          status VARCHAR(20) NOT NULL DEFAULT 'pending',
-          related_invoice_id VARCHAR REFERENCES invoices(id) ON DELETE SET NULL,
+          type TEXT NOT NULL,
+          priority TEXT NOT NULL DEFAULT 'medium',
+          status TEXT NOT NULL DEFAULT 'pending',
+          related_id VARCHAR,
+          related_type TEXT,
           due_date TIMESTAMP,
           completed_at TIMESTAMP,
           created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -135,9 +137,8 @@ export async function ensureDatabaseSchema() {
         CREATE TABLE IF NOT EXISTS financial_reports (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
           user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-          report_type VARCHAR(50) NOT NULL,
-          period_start TIMESTAMP NOT NULL,
-          period_end TIMESTAMP NOT NULL,
+          report_type TEXT NOT NULL,
+          period TEXT NOT NULL,
           data JSONB NOT NULL,
           generated_at TIMESTAMP NOT NULL DEFAULT NOW()
         );
@@ -176,6 +177,28 @@ export async function ensureDatabaseSchema() {
       await sql`
         ALTER TABLE users 
         ADD COLUMN IF NOT EXISTS last_login TIMESTAMP
+      `;
+      
+      // Fix tasks table if it has wrong columns
+      await sql`
+        ALTER TABLE tasks 
+        ADD COLUMN IF NOT EXISTS type TEXT
+      `;
+      
+      await sql`
+        ALTER TABLE tasks 
+        ADD COLUMN IF NOT EXISTS related_id VARCHAR
+      `;
+      
+      await sql`
+        ALTER TABLE tasks 
+        ADD COLUMN IF NOT EXISTS related_type TEXT
+      `;
+      
+      // Fix financial_reports table if it has wrong columns
+      await sql`
+        ALTER TABLE financial_reports 
+        ADD COLUMN IF NOT EXISTS period TEXT
       `;
       
       console.log('✅ Added any missing columns to existing tables');
