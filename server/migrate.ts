@@ -24,7 +24,7 @@ export async function ensureDatabaseSchema() {
     const tablesExist = tableCheck[0]?.exists;
 
     if (!tablesExist) {
-      console.log('📦 Creating database tables...');
+      console.log('📦 Creating database tables from scratch...');
       
       // Create all tables using raw SQL based on schema
       await sql`
@@ -150,7 +150,30 @@ export async function ensureDatabaseSchema() {
 
       console.log('✅ Database tables created successfully');
     } else {
-      console.log('✅ Database schema exists');
+      console.log('📋 Tables exist, checking for missing columns...');
+      
+      // Add missing columns to existing tables
+      try {
+        // Add payment_status and email_preferences to users table if missing
+        await sql`
+          ALTER TABLE users 
+          ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'current'
+        `;
+        
+        await sql`
+          ALTER TABLE users 
+          ADD COLUMN IF NOT EXISTS email_preferences JSONB DEFAULT '{"weeklyReports": true, "lowCashAlerts": true, "overdueInvoices": true, "integrationFailures": true}'::jsonb
+        `;
+        
+        await sql`
+          ALTER TABLE users 
+          ADD COLUMN IF NOT EXISTS last_login TIMESTAMP
+        `;
+        
+        console.log('✅ Added any missing columns to existing tables');
+      } catch (error) {
+        console.warn('⚠️  Could not add missing columns (might already exist):', error);
+      }
     }
   } catch (error) {
     console.error('❌ Failed to ensure database schema:', error);
