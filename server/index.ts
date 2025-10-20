@@ -12,6 +12,7 @@ import pg from "pg";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import lusca from "lusca";
 import { registerRoutes } from "./routes";
 import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
@@ -94,6 +95,9 @@ app.use(session({
   },
   name: 'sessionId'
 }));
+
+// CSRF protection for all authenticated requests
+app.use(lusca.csrf());
 
 app.use((req, res, next) => {
   const start = Date.now();
