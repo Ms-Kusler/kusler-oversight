@@ -18,7 +18,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
 }
 
@@ -49,17 +49,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function login(username: string, password: string) {
+  async function login(username: string, password: string): Promise<User> {
     const res = await apiRequest('POST', '/api/auth/login', {
       username,
       password
     });
     const userData = await res.json();
     setUser(userData);
+    
+    // Small delay to ensure session cookie is fully set in browser
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Verify session was established
+    await checkAuth();
+    
+    return userData;
   }
 
   async function logout() {
-    await apiRequest('POST', '/api/auth/logout');
+    try {
+      await apiRequest('POST', '/api/auth/logout');
+    } catch (error) {
+      // Ignore server logout errors - clearing client state is what matters
+      console.warn('Server logout failed, but clearing client session:', error);
+    }
     setUser(null);
   }
 

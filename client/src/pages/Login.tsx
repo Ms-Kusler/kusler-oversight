@@ -21,9 +21,15 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login(username, password);
-      setLocation("/");
+      const user = await login(username, password);
+      
+      if (user.role === 'admin') {
+        setLocation("/admin");
+      } else {
+        setLocation("/");
+      }
     } catch (error: any) {
+      setPassword("");
       toast({
         title: "Login failed",
         description: error?.message || "Invalid credentials. Please try again.",
@@ -61,6 +67,7 @@ export default function Login() {
                 required
                 disabled={isLoading}
                 data-testid="input-username"
+                autoComplete="username"
               />
             </div>
             <div className="space-y-2">
@@ -74,6 +81,7 @@ export default function Login() {
                 required
                 disabled={isLoading}
                 data-testid="input-password"
+                autoComplete="current-password"
               />
             </div>
             <Button

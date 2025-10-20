@@ -13,7 +13,11 @@ export default function DebugPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  //todo: remove mock functionality
+  // Only show in development
+  if (import.meta.env.MODE === 'production') {
+    return null;
+  }
+
   const debugInfo = {
     environment: 'production',
     version: '1.0.0',

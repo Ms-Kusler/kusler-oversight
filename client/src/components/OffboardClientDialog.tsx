@@ -27,7 +27,7 @@ export default function OffboardClientDialog({ clientId, businessName }: Offboar
 
   const deactivateMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/admin/users/${clientId}/toggle-active`, 'POST');
+      return await apiRequest('POST', `/api/admin/users/${clientId}/toggle-active`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });

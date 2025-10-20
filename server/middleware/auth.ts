@@ -5,6 +5,7 @@ declare module 'express-session' {
   interface SessionData {
     userId?: string;
     userRole?: string;
+    originalAdminId?: string;
   }
 }
 
@@ -24,6 +25,14 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
   if (!user || !user.isActive) {
     req.session.destroy(() => {});
     return res.status(401).json({ error: "Invalid or inactive user" });
+  }
+
+  // Check if account is paused for non-admin users
+  if (user.role !== 'admin' && user.paymentStatus === 'paused') {
+    return res.status(403).json({ 
+      error: "Account paused",
+      message: "Your account has been paused due to outstanding payment. Please contact support to resolve."
+    });
   }
 
   req.userId = userId;

@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Transaction, type InsertTransaction, type Invoice, type InsertInvoice, type Integration, type InsertIntegration, type Automation, type InsertAutomation, type AuditLog, type InsertAuditLog } from "@shared/schema";
+import { type User, type InsertUser, type Transaction, type InsertTransaction, type Invoice, type InsertInvoice, type Integration, type InsertIntegration, type Automation, type InsertAutomation, type AuditLog, type InsertAuditLog, type Task, type InsertTask, type FinancialReport, type InsertFinancialReport, type SupportRequest, type InsertSupportRequest } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -36,6 +36,24 @@ export interface IStorage {
   // Audit log methods
   getAuditLogs(adminId?: string): Promise<AuditLog[]>;
   createAuditLog(log: InsertAuditLog): Promise<AuditLog>;
+  
+  // Task methods
+  getTasks(userId: string, status?: string): Promise<Task[]>;
+  getTask(id: string): Promise<Task | undefined>;
+  createTask(task: InsertTask): Promise<Task>;
+  updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined>;
+  deleteTask(id: string): Promise<boolean>;
+  
+  // Financial report methods
+  getFinancialReports(userId: string, reportType?: string): Promise<FinancialReport[]>;
+  getFinancialReport(id: string): Promise<FinancialReport | undefined>;
+  createFinancialReport(report: InsertFinancialReport): Promise<FinancialReport>;
+  
+  // Support request methods
+  getSupportRequests(status?: string): Promise<SupportRequest[]>;
+  getSupportRequest(id: string): Promise<SupportRequest | undefined>;
+  createSupportRequest(request: InsertSupportRequest): Promise<SupportRequest>;
+  updateSupportRequest(id: string, updates: Partial<SupportRequest>): Promise<SupportRequest | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -45,6 +63,9 @@ export class MemStorage implements IStorage {
   private integrations: Map<string, Integration>;
   private automations: Map<string, Automation>;
   private auditLogs: Map<string, AuditLog>;
+  private tasks: Map<string, Task>;
+  private financialReports: Map<string, FinancialReport>;
+  private supportRequests: Map<string, SupportRequest>;
 
   constructor() {
     this.users = new Map();
@@ -53,6 +74,9 @@ export class MemStorage implements IStorage {
     this.integrations = new Map();
     this.automations = new Map();
     this.auditLogs = new Map();
+    this.tasks = new Map();
+    this.financialReports = new Map();
+    this.supportRequests = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -83,6 +107,7 @@ export class MemStorage implements IStorage {
       },
       role: insertUser.role ?? "client",
       isActive: true,
+      paymentStatus: "current",
       lastLogin: null,
       id 
     };
@@ -252,6 +277,104 @@ export class MemStorage implements IStorage {
     };
     this.auditLogs.set(id, log);
     return log;
+  }
+
+  async getTasks(userId: string, status?: string): Promise<Task[]> {
+    let tasks = Array.from(this.tasks.values()).filter(t => t.userId === userId);
+    if (status) {
+      tasks = tasks.filter(t => t.status === status);
+    }
+    return tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getTask(id: string): Promise<Task | undefined> {
+    return this.tasks.get(id);
+  }
+
+  async createTask(insertTask: InsertTask): Promise<Task> {
+    const id = randomUUID();
+    const task: Task = {
+      ...insertTask,
+      status: insertTask.status ?? "pending",
+      priority: insertTask.priority ?? "medium",
+      description: insertTask.description ?? null,
+      relatedId: insertTask.relatedId ?? null,
+      relatedType: insertTask.relatedType ?? null,
+      dueDate: insertTask.dueDate ?? null,
+      completedAt: null,
+      id,
+      createdAt: new Date()
+    };
+    this.tasks.set(id, task);
+    return task;
+  }
+
+  async updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined> {
+    const task = this.tasks.get(id);
+    if (!task) return undefined;
+    const updated = { ...task, ...updates };
+    this.tasks.set(id, updated);
+    return updated;
+  }
+
+  async deleteTask(id: string): Promise<boolean> {
+    return this.tasks.delete(id);
+  }
+
+  async getFinancialReports(userId: string, reportType?: string): Promise<FinancialReport[]> {
+    let reports = Array.from(this.financialReports.values()).filter(r => r.userId === userId);
+    if (reportType) {
+      reports = reports.filter(r => r.reportType === reportType);
+    }
+    return reports.sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime());
+  }
+
+  async getFinancialReport(id: string): Promise<FinancialReport | undefined> {
+    return this.financialReports.get(id);
+  }
+
+  async createFinancialReport(insertReport: InsertFinancialReport): Promise<FinancialReport> {
+    const id = randomUUID();
+    const report: FinancialReport = {
+      ...insertReport,
+      id,
+      generatedAt: new Date()
+    };
+    this.financialReports.set(id, report);
+    return report;
+  }
+
+  async getSupportRequests(status?: string): Promise<SupportRequest[]> {
+    let requests = Array.from(this.supportRequests.values());
+    if (status) {
+      requests = requests.filter(r => r.status === status);
+    }
+    return requests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getSupportRequest(id: string): Promise<SupportRequest | undefined> {
+    return this.supportRequests.get(id);
+  }
+
+  async createSupportRequest(insertRequest: InsertSupportRequest): Promise<SupportRequest> {
+    const id = randomUUID();
+    const request: SupportRequest = {
+      ...insertRequest,
+      status: insertRequest.status ?? "pending",
+      resolvedAt: null,
+      id,
+      createdAt: new Date()
+    };
+    this.supportRequests.set(id, request);
+    return request;
+  }
+
+  async updateSupportRequest(id: string, updates: Partial<SupportRequest>): Promise<SupportRequest | undefined> {
+    const request = this.supportRequests.get(id);
+    if (!request) return undefined;
+    const updated = { ...request, ...updates };
+    this.supportRequests.set(id, updated);
+    return updated;
   }
 }
 
@@ -433,9 +556,99 @@ export class PostgresStorage implements IStorage {
     const result = await this.db.insert(schema.auditLogs).values(insertLog).returning();
     return result[0];
   }
+
+  async getTasks(userId: string, status?: string): Promise<Task[]> {
+    await this.ensureDb();
+    const conditions = status 
+      ? and(eq(schema.tasks.userId, userId), eq(schema.tasks.status, status))
+      : eq(schema.tasks.userId, userId);
+    return await this.db.select()
+      .from(schema.tasks)
+      .where(conditions)
+      .orderBy(desc(schema.tasks.createdAt));
+  }
+
+  async getTask(id: string): Promise<Task | undefined> {
+    await this.ensureDb();
+    const result = await this.db.select().from(schema.tasks).where(eq(schema.tasks.id, id));
+    return result[0];
+  }
+
+  async createTask(insertTask: InsertTask): Promise<Task> {
+    await this.ensureDb();
+    const result = await this.db.insert(schema.tasks).values(insertTask).returning();
+    return result[0];
+  }
+
+  async updateTask(id: string, updates: Partial<Task>): Promise<Task | undefined> {
+    await this.ensureDb();
+    const result = await this.db.update(schema.tasks)
+      .set(updates)
+      .where(eq(schema.tasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTask(id: string): Promise<boolean> {
+    await this.ensureDb();
+    const result = await this.db.delete(schema.tasks).where(eq(schema.tasks.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getFinancialReports(userId: string, reportType?: string): Promise<FinancialReport[]> {
+    await this.ensureDb();
+    const conditions = reportType 
+      ? and(eq(schema.financialReports.userId, userId), eq(schema.financialReports.reportType, reportType))
+      : eq(schema.financialReports.userId, userId);
+    return await this.db.select()
+      .from(schema.financialReports)
+      .where(conditions)
+      .orderBy(desc(schema.financialReports.generatedAt));
+  }
+
+  async getFinancialReport(id: string): Promise<FinancialReport | undefined> {
+    await this.ensureDb();
+    const result = await this.db.select().from(schema.financialReports).where(eq(schema.financialReports.id, id));
+    return result[0];
+  }
+
+  async createFinancialReport(insertReport: InsertFinancialReport): Promise<FinancialReport> {
+    await this.ensureDb();
+    const result = await this.db.insert(schema.financialReports).values(insertReport).returning();
+    return result[0];
+  }
+
+  async getSupportRequests(status?: string): Promise<SupportRequest[]> {
+    await this.ensureDb();
+    return await this.db.select()
+      .from(schema.supportRequests)
+      .where(status ? eq(schema.supportRequests.status, status) : undefined)
+      .orderBy(desc(schema.supportRequests.createdAt));
+  }
+
+  async getSupportRequest(id: string): Promise<SupportRequest | undefined> {
+    await this.ensureDb();
+    const result = await this.db.select().from(schema.supportRequests).where(eq(schema.supportRequests.id, id));
+    return result[0];
+  }
+
+  async createSupportRequest(insertRequest: InsertSupportRequest): Promise<SupportRequest> {
+    await this.ensureDb();
+    const result = await this.db.insert(schema.supportRequests).values(insertRequest).returning();
+    return result[0];
+  }
+
+  async updateSupportRequest(id: string, updates: Partial<SupportRequest>): Promise<SupportRequest | undefined> {
+    await this.ensureDb();
+    const result = await this.db.update(schema.supportRequests)
+      .set(updates)
+      .where(eq(schema.supportRequests.id, id))
+      .returning();
+    return result[0];
+  }
 }
 
-// Use PostgreSQL in production (Vercel), MemStorage in development (Replit)
-export const storage = process.env.NODE_ENV === 'production' && process.env.DATABASE_URL 
+// Use PostgreSQL storage (persistent across restarts)
+export const storage = process.env.DATABASE_URL 
   ? new PostgresStorage() 
   : new MemStorage();

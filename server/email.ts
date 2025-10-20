@@ -164,17 +164,17 @@ function createWeeklyReportTemplate(user: User, data: {
     
     <div class="metric">
       <div class="metric-label">Money In This Week</div>
-      <div class="metric-value positive">$${data.cashIn.toLocaleString()}</div>
+      <div class="metric-value positive">$${(data.cashIn / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
     </div>
     
     <div class="metric">
       <div class="metric-label">Money Out This Week</div>
-      <div class="metric-value negative">$${data.cashOut.toLocaleString()}</div>
+      <div class="metric-value negative">$${(data.cashOut / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
     </div>
     
     <div class="metric">
       <div class="metric-label">Available Cash</div>
-      <div class="metric-value">$${data.availableCash.toLocaleString()}</div>
+      <div class="metric-value">$${(data.availableCash / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
     </div>
     
     <div class="metric">
@@ -200,9 +200,9 @@ function createWeeklyReportTemplate(user: User, data: {
     text: `
 Weekly Financial Summary - ${businessName}
 
-Money In This Week: $${data.cashIn.toLocaleString()}
-Money Out This Week: $${data.cashOut.toLocaleString()}
-Available Cash: $${data.availableCash.toLocaleString()}
+Money In This Week: $${(data.cashIn / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+Money Out This Week: $${(data.cashOut / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+Available Cash: $${(data.availableCash / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
 Invoices Due: ${data.invoicesDue}
 ${data.overdueInvoices > 0 ? `⚠️ Overdue Invoices: ${data.overdueInvoices}\n` : ''}
 
@@ -235,8 +235,8 @@ function createLowCashAlertTemplate(user: User, currentCash: number, threshold: 
     
     <div class="alert">
       <h2 style="margin-top: 0; color: #dc2626;">Your cash balance is running low</h2>
-      <p style="font-size: 18px; margin: 10px 0;"><strong>Current Balance: $${currentCash.toLocaleString()}</strong></p>
-      <p>This is below your alert threshold of $${threshold.toLocaleString()}.</p>
+      <p style="font-size: 18px; margin: 10px 0;"><strong>Current Balance: $${(currentCash / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></p>
+      <p>This is below your alert threshold of $${(threshold / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}.</p>
     </div>
     
     <p>Consider taking action to improve your cash flow:</p>
@@ -261,8 +261,8 @@ function createLowCashAlertTemplate(user: User, currentCash: number, threshold: 
 Hi ${businessName},
 
 Your cash balance is running low:
-Current Balance: $${currentCash.toLocaleString()}
-Alert Threshold: $${threshold.toLocaleString()}
+Current Balance: $${(currentCash / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+Alert Threshold: $${(threshold / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
 
 Consider taking action to improve your cash flow:
 - Follow up on overdue invoices
@@ -301,12 +301,12 @@ function createOverdueInvoiceTemplate(user: User, invoices: Array<{ client: stri
     <div class="invoice">
       <strong>${inv.client}</strong><br>
       <span style="color: #64748b;">Due: ${inv.dueDate.toLocaleDateString()}</span><br>
-      <span style="font-size: 18px; font-weight: bold; color: #dc2626;">$${inv.amount.toLocaleString()}</span>
+      <span style="font-size: 18px; font-weight: bold; color: #dc2626;">$${(inv.amount / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
     </div>
     `).join('')}
     
     <div class="total">
-      <strong>Total Overdue: $${totalOverdue.toLocaleString()}</strong>
+      <strong>Total Overdue: $${(totalOverdue / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
     </div>
     
     <p>Following up on these invoices can improve your cash flow.</p>
@@ -321,9 +321,9 @@ Hi ${businessName},
 
 You have ${invoices.length} overdue invoice${invoices.length !== 1 ? 's' : ''} that need attention:
 
-${invoices.map(inv => `${inv.client} - $${inv.amount.toLocaleString()} (Due: ${inv.dueDate.toLocaleDateString()})`).join('\n')}
+${invoices.map(inv => `${inv.client} - $${(inv.amount / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (Due: ${inv.dueDate.toLocaleDateString()})`).join('\n')}
 
-Total Overdue: $${totalOverdue.toLocaleString()}
+Total Overdue: $${(totalOverdue / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
 
 Following up on these invoices can improve your cash flow.
     `.trim()

@@ -7,11 +7,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HelpCircle, MessageSquare, Settings, LogOut } from "lucide-react";
+import { HelpCircle, Settings, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import EmailPreferencesDialog from "./EmailPreferencesDialog";
+import ThemeToggle from "./ThemeToggle";
+import RequestAssistanceDialog from "./RequestAssistanceDialog";
 
 interface DashboardHeaderProps {
   companyName?: string;
@@ -39,6 +41,7 @@ export default function DashboardHeader({ companyName = "Kusler Consulting" }: D
       </div>
       
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         {user?.role === 'client' && <EmailPreferencesDialog />}
         <ChangePasswordDialog />
         
@@ -58,10 +61,7 @@ export default function DashboardHeader({ companyName = "Kusler Consulting" }: D
               <HelpCircle className="w-4 h-4 mr-2" />
               Help & FAQ
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log('Request assistance')} data-testid="menu-request-assistance">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Request Developer Assistance
-            </DropdownMenuItem>
+            <RequestAssistanceDialog />
             <DropdownMenuSeparator />
             {user?.role === 'admin' && (
               <>

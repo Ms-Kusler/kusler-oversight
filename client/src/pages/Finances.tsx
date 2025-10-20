@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
@@ -7,24 +8,32 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownRight, DollarSign, Calendar } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
+import type { Transaction, Invoice } from "@shared/schema";
+import { format } from "date-fns";
 
 export default function Finances() {
   const [activePage, setActivePage] = useState("finances");
   const { user } = useAuth();
 
-  //todo: remove mock functionality
-  const transactions = [
-    { id: 1, type: 'payment', description: 'Client Payment - Acme Corp', amount: 5000, date: '2025-01-03' },
-    { id: 2, type: 'expense', description: 'Office Supplies', amount: -450, date: '2025-01-02' },
-    { id: 3, type: 'payment', description: 'Consulting Fee - Tech Co', amount: 3400, date: '2025-01-01' },
-    { id: 4, type: 'expense', description: 'Software Subscription', amount: -99, date: '2024-12-30' },
-  ];
+  const { data: transactions = [], isLoading: transactionsLoading } = useQuery<Transaction[]>({
+    queryKey: ['/api/transactions'],
+  });
 
-  const invoices = [
-    { id: 1, client: 'Acme Corp', amount: 5000, due: '2025-01-15', status: 'paid' },
-    { id: 2, client: 'Tech Startup', amount: 3200, due: '2025-01-10', status: 'overdue' },
-    { id: 3, client: 'Local Business', amount: 1800, due: '2025-01-20', status: 'due' },
-  ];
+  const { data: invoices = [], isLoading: invoicesLoading } = useQuery<Invoice[]>({
+    queryKey: ['/api/invoices'],
+  });
+
+  // Calculate totals from transactions
+  const totalIncome = transactions
+    .filter(t => t.type === 'payment')
+    .reduce((sum, t) => sum + t.amount, 0);
+  
+  const totalExpenses = Math.abs(transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0));
+  
+  const netProfit = totalIncome - totalExpenses;
 
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
@@ -50,8 +59,8 @@ export default function Finances() {
                 </div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Total Income</span>
               </div>
-              <p className="text-3xl font-bold font-mono text-chart-2">$8,400</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">This month</p>
+              <p className="text-3xl font-bold font-mono text-chart-2">{formatCurrency(totalIncome)}</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">All time</p>
             </Card>
 
             <Card className="p-4 sm:p-5 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl hover-elevate transition-all duration-300">
@@ -61,8 +70,8 @@ export default function Finances() {
                 </div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Total Expenses</span>
               </div>
-              <p className="text-3xl font-bold font-mono text-destructive">$6,200</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">This month</p>
+              <p className="text-3xl font-bold font-mono text-destructive">{formatCurrency(totalExpenses)}</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">All time</p>
             </Card>
 
             <Card className="p-4 sm:p-5 backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl hover-elevate transition-all duration-300">
@@ -72,8 +81,8 @@ export default function Finances() {
                 </div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">Net Profit</span>
               </div>
-              <p className="text-3xl font-bold font-mono text-primary">$2,200</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">This month</p>
+              <p className="text-3xl font-bold font-mono text-primary">{formatCurrency(netProfit)}</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">All time</p>
             </Card>
           </div>
 
@@ -94,11 +103,11 @@ export default function Finances() {
                     </div>
                     <div>
                       <p className="font-medium text-sm">{transaction.description}</p>
-                      <p className="text-xs text-muted-foreground">{transaction.date}</p>
+                      <p className="text-xs text-muted-foreground">{format(new Date(transaction.date), 'MMM d, yyyy')}</p>
                     </div>
                   </div>
-                  <span className={`font-mono font-semibold ${transaction.amount > 0 ? 'text-chart-2' : 'text-destructive'}`}>
-                    {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+                  <span className={`font-mono font-semibold ${transaction.type === 'payment' ? 'text-chart-2' : 'text-destructive'}`}>
+                    {transaction.type === 'payment' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}
                   </span>
                 </div>
               ))}
@@ -117,11 +126,11 @@ export default function Finances() {
                       <p className="font-medium">{invoice.client}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Calendar className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Due {invoice.due}</span>
+                        <span className="text-xs text-muted-foreground">Due {format(new Date(invoice.dueDate), 'MMM d, yyyy')}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono font-semibold text-lg">${invoice.amount.toLocaleString()}</p>
+                      <p className="font-mono font-semibold text-lg">{formatCurrency(invoice.amount)}</p>
                       <Badge 
                         variant={invoice.status === 'paid' ? 'default' : invoice.status === 'overdue' ? 'destructive' : 'secondary'}
                         className="text-xs mt-1"

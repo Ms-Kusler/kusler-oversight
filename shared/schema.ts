@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   email: text("email"),
   role: text("role").notNull().default("client"),
   isActive: boolean("is_active").notNull().default(true),
+  paymentStatus: text("payment_status").notNull().default("current"),
   lastLogin: timestamp("last_login"),
   emailPreferences: jsonb("email_preferences").default({
     weeklyReports: true,
@@ -25,7 +26,7 @@ export const integrations = pgTable("integrations", {
   userId: varchar("user_id").notNull().references(() => users.id),
   platform: text("platform").notNull(),
   isConnected: boolean("is_connected").notNull().default(false),
-  credentials: jsonb("credentials"),
+  credentials: text("credentials"),
   lastSynced: timestamp("last_synced"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -73,6 +74,41 @@ export const invoices = pgTable("invoices", {
   source: text("source"),
 });
 
+export const tasks = pgTable("tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  type: text("type").notNull(),
+  priority: text("priority").notNull().default("medium"),
+  status: text("status").notNull().default("pending"),
+  relatedId: varchar("related_id"),
+  relatedType: text("related_type"),
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const financialReports = pgTable("financial_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  reportType: text("report_type").notNull(),
+  period: text("period").notNull(),
+  data: jsonb("data").notNull(),
+  generatedAt: timestamp("generated_at").notNull().defaultNow(),
+});
+
+export const supportRequests = pgTable("support_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  category: text("category").notNull(),
+  description: text("description").notNull(),
+  status: text("status").notNull().default("pending"),
+  ticketId: text("ticket_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -99,6 +135,23 @@ export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
   createdAt: true,
 });
 
+export const insertTaskSchema = createInsertSchema(tasks).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
+export const insertFinancialReportSchema = createInsertSchema(financialReports).omit({
+  id: true,
+  generatedAt: true,
+});
+
+export const insertSupportRequestSchema = createInsertSchema(supportRequests).omit({
+  id: true,
+  createdAt: true,
+  resolvedAt: true,
+});
+
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
   date: true,
@@ -120,3 +173,9 @@ export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+export type Task = typeof tasks.$inferSelect;
+export type InsertFinancialReport = z.infer<typeof insertFinancialReportSchema>;
+export type FinancialReport = typeof financialReports.$inferSelect;
+export type InsertSupportRequest = z.infer<typeof insertSupportRequestSchema>;
+export type SupportRequest = typeof supportRequests.$inferSelect;

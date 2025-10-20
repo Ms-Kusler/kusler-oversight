@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import DebugPanel from "@/components/DebugPanel";
+import IntegrationDialog from "@/components/IntegrationDialog";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ const AVAILABLE_PLATFORMS = [
   { id: 'quickbooks', name: 'QuickBooks', description: 'Accounting & invoicing' },
   { id: 'stripe', name: 'Stripe', description: 'Payment processing' },
   { id: 'paypal', name: 'PayPal', description: 'Payment processing' },
+  { id: 'zapier', name: 'Zapier', description: 'Workflow automation' },
   { id: 'asana', name: 'Asana', description: 'Project management' },
   { id: 'monday', name: 'Monday.com', description: 'Project management' },
   { id: 'xero', name: 'Xero', description: 'Accounting' },
@@ -23,6 +25,8 @@ const AVAILABLE_PLATFORMS = [
 
 export default function Workflows() {
   const [activePage, setActivePage] = useState("workflows");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<typeof AVAILABLE_PLATFORMS[0] | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -35,24 +39,34 @@ export default function Workflows() {
   });
 
   const connectMutation = useMutation({
-    mutationFn: async (platform: string) => {
-      return await apiRequest('/api/integrations', 'POST', {
+    mutationFn: async ({ platform, credentials }: { platform: string; credentials: Record<string, string> }) => {
+      return await apiRequest('POST', '/api/integrations', {
         platform,
-        isConnected: true
+        isConnected: true,
+        credentials
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations'] });
+      setDialogOpen(false);
+      setSelectedPlatform(null);
       toast({
         title: "Integration connected",
         description: "Your integration has been connected successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Connection failed",
+        description: "Failed to connect integration. Please check your credentials.",
+        variant: "destructive"
       });
     }
   });
 
   const disconnectMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/integrations/${id}`, 'DELETE');
+      return await apiRequest('DELETE', `/api/integrations/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations'] });
@@ -113,33 +127,47 @@ export default function Workflows() {
           {automations.length > 0 && (
             <Card className="backdrop-blur-xl bg-card/80 border-card-border/50 shadow-xl">
               <div className="p-4 sm:p-5 border-b border-border/50">
-                <h2 className="font-semibold text-lg">Active Automations</h2>
+                <h2 className="font-semibold text-lg">Kusler Consulting Automations</h2>
+                <p className="text-sm text-muted-foreground mt-1">Background tasks running automatically for your business</p>
               </div>
               <div className="divide-y divide-border/30">
-                {automations.map((automation) => (
-                  <div key={automation.id} className="p-4 hover-elevate transition-all duration-200" data-testid={`automation-${automation.id}`}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium">{automation.name}</h3>
-                          <Badge 
-                            variant={automation.isActive ? 'default' : 'secondary'}
-                            className="text-xs"
-                          >
-                            {automation.isActive ? 'active' : 'paused'}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{automation.type}</p>
-                        {automation.lastRun && (
-                          <div className="flex items-center gap-1 mt-2">
-                            <Clock className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">Last run: {formatLastSync(automation.lastRun)}</span>
+                {automations.map((automation) => {
+                  const config = automation.config as any;
+                  return (
+                    <div key={automation.id} className="p-4 hover-elevate transition-all duration-200" data-testid={`automation-${automation.id}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Zap className="w-4 h-4 text-chart-3" />
+                            <h3 className="font-medium">{automation.name}</h3>
+                            <Badge 
+                              variant={automation.isActive ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {automation.isActive ? 'Active' : 'Paused'}
+                            </Badge>
                           </div>
-                        )}
+                          {config?.description && (
+                            <p className="text-sm text-muted-foreground mt-1">{config.description}</p>
+                          )}
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            {config?.frequency && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                <span>{config.frequency}</span>
+                              </div>
+                            )}
+                            {automation.lastRun && (
+                              <div className="flex items-center gap-1">
+                                <span>Last run: {formatLastSync(automation.lastRun)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           )}
@@ -182,7 +210,8 @@ export default function Workflows() {
                         if (isConnected && integration) {
                           disconnectMutation.mutate(integration.id);
                         } else {
-                          connectMutation.mutate(platform.id);
+                          setSelectedPlatform(platform);
+                          setDialogOpen(true);
                         }
                       }}
                       disabled={connectMutation.isPending || disconnectMutation.isPending}
@@ -199,6 +228,13 @@ export default function Workflows() {
 
         <BottomNav active={activePage} onNavigate={setActivePage} />
         <DebugPanel />
+        <IntegrationDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          platform={selectedPlatform}
+          onConnect={(credentials) => connectMutation.mutate({ platform: selectedPlatform!.id, credentials })}
+          isPending={connectMutation.isPending}
+        />
       </div>
     </div>
   );

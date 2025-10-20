@@ -19,9 +19,12 @@ export default function ProfitChart({ percentage, trend, data }: ProfitChartProp
         style={{ background: trend === 'up' ? 'hsl(var(--chart-2))' : 'hsl(var(--chart-5))' }}
       />
       
-      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide relative z-10">
-        Profit Snapshot
-      </h3>
+      <div className="relative z-10">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          Profit Snapshot
+        </h3>
+        <p className="text-xs text-muted-foreground/60 mt-0.5">Last 7 days</p>
+      </div>
       
       <div className="h-24 relative z-10">
         <ResponsiveContainer width="100%" height="100%">
@@ -52,9 +55,9 @@ export default function ProfitChart({ percentage, trend, data }: ProfitChartProp
         )}
         <div className="flex items-baseline gap-1 sm:gap-2">
           <span className={`text-2xl sm:text-3xl font-bold font-mono ${trend === 'up' ? 'text-chart-2' : 'text-chart-5'}`}>
-            {trend === 'up' ? 'Up' : 'Down'} {percentage}%
+            {percentage}%
           </span>
-          <span className="text-xs sm:text-sm text-muted-foreground/70">Vs. month</span>
+          <span className="text-xs sm:text-sm text-muted-foreground/70">margin</span>
         </div>
       </div>
     </Card>

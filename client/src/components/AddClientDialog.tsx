@@ -18,7 +18,7 @@ export default function AddClientDialog() {
 
   const createClientMutation = useMutation({
     mutationFn: async (data: { businessName: string; email: string; username: string; password: string }) => {
-      return await apiRequest('/api/admin/users', 'POST', data);
+      return await apiRequest('POST', '/api/admin/users', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });

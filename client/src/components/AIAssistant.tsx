@@ -1,14 +1,26 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Sparkles, TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Target, Calendar, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
+
+interface Recommendation {
+  icon: string;
+  text: string;
+  action: string;
+  color: string;
+}
+
+const iconMap = {
+  Target,
+  Calendar,
+  DollarSign,
+  AlertTriangle,
+  TrendingUp,
+};
 
 export default function AIAssistant() {
-  //todo: remove mock functionality
-  const insights = [
-    { type: 'success', icon: CheckCircle2, text: 'Your cash flow is healthy - 3.2 months of runway available', color: 'text-chart-2' },
-    { type: 'warning', icon: AlertTriangle, text: 'Invoice #1042 is 5 days overdue - consider sending reminder', color: 'text-chart-3' },
-    { type: 'insight', icon: TrendingUp, text: 'Revenue up 14% vs last month - great momentum!', color: 'text-primary' },
-  ];
+  const { data: recommendations = [], isLoading } = useQuery<Recommendation[]>({
+    queryKey: ['/api/ai-recommendations'],
+  });
 
   return (
     <Card className="p-4 sm:p-5 backdrop-blur-xl bg-gradient-to-br from-card/90 to-card/60 border-card-border/50 shadow-xl relative overflow-hidden" data-testid="card-ai-assistant">
@@ -20,30 +32,32 @@ export default function AIAssistant() {
         </div>
         <div>
           <h3 className="font-semibold text-base">AI Assistant</h3>
-          <p className="text-xs text-muted-foreground">Smart insights from your data</p>
+          <p className="text-xs text-muted-foreground">Recommended actions</p>
         </div>
       </div>
 
-      <div className="space-y-3 relative z-10">
-        {insights.map((insight, idx) => {
-          const Icon = insight.icon;
-          return (
-            <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-background/40 backdrop-blur-sm hover-elevate transition-all duration-200">
-              <Icon className={`w-4 h-4 mt-0.5 ${insight.color}`} />
-              <p className="text-sm text-foreground/90 flex-1">{insight.text}</p>
-            </div>
-          );
-        })}
+      <div className="space-y-2.5 relative z-10">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          recommendations.map((rec, idx) => {
+            const Icon = iconMap[rec.icon as keyof typeof iconMap] || Target;
+            return (
+              <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-background/40 backdrop-blur-sm hover-elevate active-elevate-2 transition-all duration-200 cursor-pointer group">
+                <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${rec.color}`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-foreground/90">{rec.text}</p>
+                  <span className="text-xs text-primary/70 group-hover:text-primary transition-colors mt-1 inline-block">
+                    → {rec.action}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
-
-      <Button 
-        variant="outline" 
-        className="w-full mt-4 backdrop-blur-xl bg-card/40 border-border/50"
-        onClick={() => console.log('View all insights')}
-        data-testid="button-view-insights"
-      >
-        View All Insights
-      </Button>
     </Card>
   );
 }

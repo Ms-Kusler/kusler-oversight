@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { Integration } from "@shared/schema";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useAuth } from "@/lib/auth";
 import TimePeriodSelector from "@/components/TimePeriodSelector";
@@ -12,40 +11,39 @@ import ActionButtons from "@/components/ActionButtons";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import AIAssistant from "@/components/AIAssistant";
-import ProjectUpdates from "@/components/ProjectUpdates";
-import SecurityStatus from "@/components/SecurityStatus";
+import RecentActivity from "@/components/RecentActivity";
 import DebugPanel from "@/components/DebugPanel";
+import TasksCard from "@/components/TasksCard";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("home");
   const [period, setPeriod] = useState("This Month");
   const { user } = useAuth();
 
-  const { data: integrations = [] } = useQuery<Integration[]>({
-    queryKey: ['/api/integrations'],
-  });
-
-  const { data: dashboardData } = useQuery({
+  const { data: dashboardData, isLoading } = useQuery<{
+    moneyIn: number;
+    moneyOut: number;
+    availableCash: number;
+    invoicesDue: number;
+    invoicesOverdue: number;
+    profitTrend: Array<{ value: number }>;
+  }>({
     queryKey: ['/api/dashboard'],
   });
 
-  const profitData = [
-    { value: 3200 },
-    { value: 3800 },
-    { value: 3500 },
-    { value: 4200 },
-    { value: 4800 },
-    { value: 4300 },
-    { value: 5100 }
-  ];
-
-  const connectedIntegrations = integrations.filter(i => i.isConnected);
-  const hasFinancialTools = connectedIntegrations.some(i => 
-    ['stripe', 'paypal', 'quickbooks', 'xero'].includes(i.platform.toLowerCase())
-  );
-  const hasProjectManagement = connectedIntegrations.some(i => 
-    ['asana', 'monday', 'trello', 'clickup'].includes(i.platform.toLowerCase())
-  );
+  const moneyIn = dashboardData?.moneyIn ? (dashboardData.moneyIn / 100).toFixed(0) : '0';
+  const moneyOut = dashboardData?.moneyOut ? (dashboardData.moneyOut / 100).toFixed(0) : '0';
+  const availableCash = dashboardData?.availableCash ? (dashboardData.availableCash / 100).toFixed(0) : '0';
+  const invoicesDue = dashboardData?.invoicesDue ?? 0;
+  const invoicesOverdue = dashboardData?.invoicesOverdue ?? 0;
+  
+  const totalMoney = dashboardData?.moneyIn ?? 0;
+  const moneyInNum = dashboardData?.moneyIn ?? 1;
+  const moneyOutNum = dashboardData?.moneyOut ?? 0;
+  const progressPercent = totalMoney > 0 ? Math.round((moneyOutNum / moneyInNum) * 100) : 0;
+  
+  const profitMargin = moneyInNum > 0 ? Math.round(((moneyInNum - moneyOutNum) / moneyInNum) * 100) : 0;
+  const profitTrend = profitMargin >= 0 ? 'up' : 'down';
 
   return (
     <div className="min-h-screen pb-20 bg-background relative overflow-hidden">
@@ -68,37 +66,30 @@ export default function Dashboard() {
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <MetricCard 
               title="Money In & Out"
-              value="$8,400"
-              subtitle="$ 6,200 spent"
-              progress={57}
+              value={isLoading ? '...' : `$${moneyIn}`}
+              subtitle={isLoading ? '...' : `$ ${moneyOut} spent`}
+              progress={progressPercent}
               glowColor="hsl(var(--chart-1))"
             />
-            <BillsCard invoicesDue={3} overdue={1} />
+            <BillsCard invoicesDue={invoicesDue} overdue={invoicesOverdue} />
           </div>
 
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <MetricCard 
               title="Available Cash"
-              value="$12,560"
+              value={isLoading ? '...' : `$${availableCash}`}
               subtitle="available"
               glowColor="hsl(var(--chart-2))"
             />
-            <ProfitChart percentage={14} trend="up" data={profitData} />
+            <ProfitChart percentage={Math.abs(profitMargin)} trend={profitTrend} data={dashboardData?.profitTrend ?? []} />
           </div>
+
+          <TasksCard />
 
           <div className="grid gap-3 sm:gap-4">
-            {hasFinancialTools && <AIAssistant />}
-            {hasProjectManagement && <ProjectUpdates />}
-            {!hasFinancialTools && !hasProjectManagement && (
-              <div className="p-6 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm text-center">
-                <p className="text-muted-foreground">
-                  Connect your tools to see AI insights and project updates
-                </p>
-              </div>
-            )}
+            <AIAssistant />
+            <RecentActivity />
           </div>
-
-          <SecurityStatus />
           
           <SystemStatus />
 
