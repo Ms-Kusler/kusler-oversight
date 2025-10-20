@@ -12,21 +12,29 @@ export async function ensureDatabaseSchema() {
     console.log('🔍 Checking database schema...');
     const sql = neon(databaseUrl);
 
-    // Check if users table exists
-    const tableCheck = await sql`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'users'
-      );
-    `;
+    // Check which tables exist
+    const tableCheck = async (tableName: string) => {
+      const result = await sql`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = ${tableName}
+        );
+      `;
+      return result[0]?.exists;
+    };
 
-    const tablesExist = tableCheck[0]?.exists;
+    const usersExist = await tableCheck('users');
+    const tasksExist = await tableCheck('tasks');
+    const financialReportsExist = await tableCheck('financial_reports');
+    const supportRequestsExist = await tableCheck('support_requests');
 
-    if (!tablesExist) {
-      console.log('📦 Creating database tables from scratch...');
-      
-      // Create all tables using raw SQL based on schema
+    console.log(`📊 Table status: users=${usersExist}, tasks=${tasksExist}, financial_reports=${financialReportsExist}, support_requests=${supportRequestsExist}`);
+
+    // Create missing tables (CREATE TABLE IF NOT EXISTS is safe)
+    console.log('📦 Creating any missing tables...');
+    
+    // Create all tables using raw SQL based on schema
       await sql`
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -148,32 +156,31 @@ export async function ensureDatabaseSchema() {
         );
       `;
 
-      console.log('✅ Database tables created successfully');
-    } else {
-      console.log('📋 Tables exist, checking for missing columns...');
+    console.log('✅ All tables ensured (created if missing)');
+    
+    // Now check for missing columns in existing tables
+    console.log('📋 Checking for missing columns...');
+    
+    try {
+      // Add payment_status and email_preferences to users table if missing
+      await sql`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'current'
+      `;
       
-      // Add missing columns to existing tables
-      try {
-        // Add payment_status and email_preferences to users table if missing
-        await sql`
-          ALTER TABLE users 
-          ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'current'
-        `;
-        
-        await sql`
-          ALTER TABLE users 
-          ADD COLUMN IF NOT EXISTS email_preferences JSONB DEFAULT '{"weeklyReports": true, "lowCashAlerts": true, "overdueInvoices": true, "integrationFailures": true}'::jsonb
-        `;
-        
-        await sql`
-          ALTER TABLE users 
-          ADD COLUMN IF NOT EXISTS last_login TIMESTAMP
-        `;
-        
-        console.log('✅ Added any missing columns to existing tables');
-      } catch (error) {
-        console.warn('⚠️  Could not add missing columns (might already exist):', error);
-      }
+      await sql`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS email_preferences JSONB DEFAULT '{"weeklyReports": true, "lowCashAlerts": true, "overdueInvoices": true, "integrationFailures": true}'::jsonb
+      `;
+      
+      await sql`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS last_login TIMESTAMP
+      `;
+      
+      console.log('✅ Added any missing columns to existing tables');
+    } catch (error) {
+      console.warn('⚠️  Could not add missing columns (might already exist):', error);
     }
   } catch (error) {
     console.error('❌ Failed to ensure database schema:', error);
