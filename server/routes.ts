@@ -508,6 +508,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rate limiter: max 1 reset per 5 minutes per IP
+  const resetDemoRateLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 1,
+    message: "Too many demo resets from this IP, please try again in 5 minutes."
+  });
+
   app.post("/api/admin/reset-demo", requireAdmin, resetDemoRateLimiter, async (req: AuthRequest, res) => {
     try {
       const demoUser = await storage.getUserByUsername('demo');
