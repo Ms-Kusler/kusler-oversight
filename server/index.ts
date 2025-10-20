@@ -15,6 +15,7 @@ import { fileURLToPath } from "url";
 import { registerRoutes } from "./routes";
 import { startAutomations } from "./automation";
 import { seedAdminUser, seedDemoClient } from "./seed";
+import { ensureDatabaseSchema } from "./migrate";
 
 const { Pool } = pg;
 const pgSession = connectPgSimple(session);
@@ -179,6 +180,8 @@ app.use((req, res, next) => {
     logFn(`serving on port ${port}`);
     
     try {
+      // Ensure database schema exists before seeding
+      await ensureDatabaseSchema();
       await seedAdminUser();
       await seedDemoClient();
       startAutomations();
