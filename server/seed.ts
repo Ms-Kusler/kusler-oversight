@@ -2,70 +2,80 @@ import { storage } from './storage';
 import { hashPassword } from './auth';
 
 export async function seedAdminUser() {
-  const adminUsername = 'admin';
-  
-  const existingAdmin = await storage.getUserByUsername(adminUsername);
-  
-  if (existingAdmin) {
-    console.log('✓ Admin user already exists');
-    return existingAdmin;
+  try {
+    const adminUsername = 'admin';
+    
+    const existingAdmin = await storage.getUserByUsername(adminUsername);
+    
+    if (existingAdmin) {
+      console.log('✓ Admin user already exists');
+      return existingAdmin;
+    }
+    
+    const adminPassword = await hashPassword('admin123');
+    
+    const admin = await storage.createUser({
+      username: adminUsername,
+      password: adminPassword,
+      email: 'admin@kuslerconsulting.com',
+      businessName: 'Kusler Consulting',
+      role: 'admin'
+    });
+    
+    console.log('✓ Admin user created');
+    console.log('  Username: admin');
+    console.log('  Password: admin123');
+    console.log('  ⚠️  IMPORTANT: Change this password immediately in production!');
+    
+    return admin;
+  } catch (error) {
+    console.error('❌ Failed to seed admin user:', error);
+    throw error;
   }
-  
-  const adminPassword = await hashPassword('admin123');
-  
-  const admin = await storage.createUser({
-    username: adminUsername,
-    password: adminPassword,
-    email: 'admin@kuslerconsulting.com',
-    businessName: 'Kusler Consulting',
-    role: 'admin'
-  });
-  
-  console.log('✓ Admin user created');
-  console.log('  Username: admin');
-  console.log('  Password: admin123');
-  console.log('  ⚠️  IMPORTANT: Change this password immediately in production!');
-  
-  return admin;
 }
 
 export async function seedDemoClient() {
-  const demoUsername = 'demo';
-  
-  const existingDemo = await storage.getUserByUsername(demoUsername);
-  
-  if (existingDemo) {
-    console.log('✓ Demo client already exists');
+  try {
+    const demoUsername = 'demo';
     
-    // Check if demo has any transactions - if not, reseed
-    const transactions = await storage.getTransactions(existingDemo.id);
-    if (transactions.length === 0) {
-      console.log('  ↻ Reseeding demo data with current dates...');
-      await seedDemoData(existingDemo.id);
+    const existingDemo = await storage.getUserByUsername(demoUsername);
+    
+    if (existingDemo) {
+      console.log('✓ Demo client already exists');
+      
+      // Check if demo has any transactions - if not, reseed
+      const transactions = await storage.getTransactions(existingDemo.id);
+      if (transactions.length === 0) {
+        console.log('  ↻ Reseeding demo data with current dates...');
+        await seedDemoData(existingDemo.id);
+      }
+      
+      return existingDemo;
     }
     
-    return existingDemo;
+    const demoPassword = await hashPassword('demo123');
+    
+    const demoClient = await storage.createUser({
+      username: demoUsername,
+      password: demoPassword,
+      email: 'contact@acmeplumbing.com',
+      businessName: 'Acme Plumbing LLC',
+      role: 'client'
+    });
+    
+    console.log('✓ Demo client created');
+    console.log('  Username: demo');
+    console.log('  Password: demo123');
+    console.log('  Business: Acme Plumbing LLC');
+    
+    // Seed sample data for demo account
+    await seedDemoData(demoClient.id);
+    
+    return demoClient;
+  } catch (error) {
+    console.error('❌ Failed to seed demo client:', error);
+    throw error;
   }
-  
-  const demoPassword = await hashPassword('demo123');
-  
-  const demoClient = await storage.createUser({
-    username: demoUsername,
-    password: demoPassword,
-    email: 'contact@acmeplumbing.com',
-    businessName: 'Acme Plumbing LLC',
-    role: 'client'
-  });
-  
-  console.log('✓ Demo client created');
-  console.log('  Username: demo');
-  console.log('  Password: demo123');
-  console.log('  Business: Acme Plumbing LLC');
-  
-  // Seed sample data for demo account
-  await seedDemoData(demoClient.id);
-  
-  return demoClient;
 }
 
 export async function seedDemoData(userId: string) {

@@ -177,9 +177,16 @@ app.use((req, res, next) => {
   }, async () => {
     const logFn = (globalThis as any).__viteLog || simpleLog;
     logFn(`serving on port ${port}`);
-    await seedAdminUser();
-    await seedDemoClient();
-    startAutomations();
+    
+    try {
+      await seedAdminUser();
+      await seedDemoClient();
+      startAutomations();
+    } catch (error) {
+      logFn(`⚠️  Startup error: ${error}`);
+      logFn('Server is running but seeding/automations may have failed.');
+      logFn('Please check environment variables (DATABASE_URL, ENCRYPTION_KEY)');
+    }
   });
 
   // Graceful shutdown
