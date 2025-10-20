@@ -12,11 +12,69 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Search, HelpCircle, MessageSquare } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, HelpCircle, MessageSquare, PlayCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function FAQ() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [assistanceOpen, setAssistanceOpen] = useState(false);
+  const [tutorialsOpen, setTutorialsOpen] = useState(false);
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
   const { user } = useAuth();
+  const { toast } = useToast();
+
+  const requestMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/support/request-assistance', {
+        category,
+        description
+      });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Request Submitted",
+        description: `Your request (${data.ticketId}) has been submitted. We'll contact you within 24 hours.`,
+      });
+      setAssistanceOpen(false);
+      setCategory("");
+      setDescription("");
+    },
+    onError: () => {
+      toast({
+        title: "Request Failed",
+        description: "Failed to submit your request. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleSubmitRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!category || !description.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a category and describe your issue.",
+        variant: "destructive"
+      });
+      return;
+    }
+    requestMutation.mutate();
+  };
 
   //todo: remove mock functionality
   const faqs = [
@@ -98,7 +156,7 @@ export default function FAQ() {
             <Button
               variant="outline"
               className="justify-start gap-3 h-auto p-4 backdrop-blur-xl bg-card/60 border-border/50 hover-elevate"
-              onClick={() => console.log('Request assistance')}
+              onClick={() => setAssistanceOpen(true)}
               data-testid="button-request-assistance"
             >
               <div className="p-2 rounded-lg bg-primary/10">
@@ -113,11 +171,11 @@ export default function FAQ() {
             <Button
               variant="outline"
               className="justify-start gap-3 h-auto p-4 backdrop-blur-xl bg-card/60 border-border/50 hover-elevate"
-              onClick={() => console.log('View tutorials')}
+              onClick={() => setTutorialsOpen(true)}
               data-testid="button-tutorials"
             >
               <div className="p-2 rounded-lg bg-chart-2/10">
-                <HelpCircle className="w-5 h-5 text-chart-2" />
+                <PlayCircle className="w-5 h-5 text-chart-2" />
               </div>
               <div className="text-left">
                 <p className="font-medium">Video Tutorials</p>
@@ -164,6 +222,112 @@ export default function FAQ() {
         <BottomNav active="home" />
         <DebugPanel />
       </div>
+
+      {/* Request Assistance Dialog */}
+      <Dialog open={assistanceOpen} onOpenChange={setAssistanceOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <form onSubmit={handleSubmitRequest}>
+            <DialogHeader>
+              <DialogTitle>Request Developer Assistance</DialogTitle>
+              <DialogDescription>
+                Get personalized help from the Kusler Consulting team. We'll respond within 24 hours.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="category">Issue Category</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger id="category" data-testid="select-category">
+                    <SelectValue placeholder="Select category..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="integration_setup">Integration Setup</SelectItem>
+                    <SelectItem value="billing">Billing Question</SelectItem>
+                    <SelectItem value="technical_issue">Technical Issue</SelectItem>
+                    <SelectItem value="feature_request">Feature Request</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe your issue or question in detail..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="min-h-[120px]"
+                  data-testid="textarea-description"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAssistanceOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={requestMutation.isPending}
+                data-testid="button-submit"
+              >
+                {requestMutation.isPending ? 'Submitting...' : 'Submit Request'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Video Tutorials Dialog */}
+      <Dialog open={tutorialsOpen} onOpenChange={setTutorialsOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Video Tutorials</DialogTitle>
+            <DialogDescription>
+              Learn how to get the most out of Kusler Oversight
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-auto p-4"
+                onClick={() => window.open('https://youtube.com/@kuslerconsulting', '_blank')}
+              >
+                <PlayCircle className="w-5 h-5 text-primary" />
+                <div className="text-left">
+                  <p className="font-medium">Getting Started Guide</p>
+                  <p className="text-xs text-muted-foreground">Connect your first integration and set up automations (5 min)</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-auto p-4"
+                onClick={() => window.open('https://youtube.com/@kuslerconsulting', '_blank')}
+              >
+                <PlayCircle className="w-5 h-5 text-primary" />
+                <div className="text-left">
+                  <p className="font-medium">Understanding Your Dashboard</p>
+                  <p className="text-xs text-muted-foreground">Navigate financial insights and key metrics (3 min)</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-auto p-4"
+                onClick={() => window.open('https://youtube.com/@kuslerconsulting', '_blank')}
+              >
+                <PlayCircle className="w-5 h-5 text-primary" />
+                <div className="text-left">
+                  <p className="font-medium">Setting Up Email Alerts</p>
+                  <p className="text-xs text-muted-foreground">Configure notifications for low cash, overdue invoices, and more (4 min)</p>
+                </div>
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

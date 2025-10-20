@@ -146,6 +146,10 @@ All webhook handlers implemented and secured:
 - **Platform**: Railway (with trust proxy configured for sessions)
 - **Database**: PostgreSQL via Neon (persistent, production-ready)
 - **Tables**: users, transactions, invoices, integrations, automations, audit_logs, tasks, financial_reports, support_requests
+- **Default Railway URL**: `kusler-oversight-production.up.railway.app`
+- **Custom Domain**: Can link kuslerconsulting.com via Railway Settings → Domains → Add Custom Domain
+  - Add CNAME record in Squarespace: `oversight` → `kusler-oversight-production.up.railway.app`
+  - Access app at `oversight.kuslerconsulting.com`
 - **Required Secrets**: 
   - `DATABASE_URL` - PostgreSQL connection string
   - `SESSION_SECRET` - Session encryption key
