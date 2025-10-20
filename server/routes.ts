@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertIntegrationSchema, insertAutomationSchema, insertTaskSchema, insertFinancialReportSchema } from "@shared/schema";
 import { requireAuth, requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
@@ -9,6 +10,13 @@ import { encryptCredentials, decryptCredentials } from "./encryption";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Rate limiter specifically for /api/admin/reset-demo (5 requests per hour per IP)
+  const resetDemoRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // limit each IP to 5 reset demo requests per hour
+    message: { error: "Too many demo resets from this IP, please try again later." }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -500,7 +508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/reset-demo", requireAdmin, async (req: AuthRequest, res) => {
+  app.post("/api/admin/reset-demo", requireAdmin, resetDemoRateLimiter, async (req: AuthRequest, res) => {
     try {
       const demoUser = await storage.getUserByUsername('demo');
       
