@@ -9,6 +9,12 @@ import { createSmartTasks, autoReconcileTransactions, generateFinancialReports }
 import { encryptCredentials, decryptCredentials } from "./encryption";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Rate limiter specifically for /api/admin/reset-demo (5 requests per hour per IP)
+  const resetDemoRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // limit each IP to 5 reset demo requests per hour
+    message: { error: "Too many demo resets from this IP, please try again later." }
   // Rate limiter for admin routes (e.g., 10 requests per minute per IP)
   const adminLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
@@ -509,7 +515,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/reset-demo", requireAdmin, async (req: AuthRequest, res) => {
+  // Rate limiter: max 1 reset per 5 minutes per IP
+  const resetDemoRateLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 1,
+    message: "Too many demo resets from this IP, please try again in 5 minutes."
+  });
+
+  app.post("/api/admin/reset-demo", requireAdmin, resetDemoRateLimiter, async (req: AuthRequest, res) => {
     try {
       const demoUser = await storage.getUserByUsername('demo');
       
