@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertIntegrationSchema, insertAutomationSchema, insertTaskSchema, insertFinancialReportSchema } from "@shared/schema";
 import { requireAuth, requireAdmin, logAdminAction, type AuthRequest } from "./middleware/auth";
@@ -8,7 +9,15 @@ import { createSmartTasks, autoReconcileTransactions, generateFinancialReports }
 import { encryptCredentials, decryptCredentials } from "./encryption";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+  // Rate limiter for admin routes (e.g., 10 requests per minute per IP)
+  const adminLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // limit each IP to 10 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests, please try again later." }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -915,7 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update client payment status (admin only)
-  app.patch("/api/admin/users/:id/payment-status", requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  app.patch("/api/admin/users/:id/payment-status", requireAuth, adminLimiter, requireAdmin, async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
       const { paymentStatus } = req.body;
